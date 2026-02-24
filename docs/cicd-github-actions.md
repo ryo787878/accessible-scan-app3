@@ -30,3 +30,4 @@ Secrets（推奨）:
 1. main に push
 2. GitHub Actions の `Deploy to VPS` が成功すること
 3. VPS側で `npx playwright install chromium` が実行されていること（workflow内）
+4. VPS側で `npx prisma migrate deploy` が実行され、最新スキーマが反映されること（workflow内）

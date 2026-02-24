@@ -8,7 +8,7 @@
 - Next.jsは別ドメイン（例: `access-scan.com`）で公開する
 - CloudflareでDNS管理する
 - アプリはNode.js + `next start`（またはstandalone）で常駐させる
-- SQLiteはアプリ公開ディレクトリ外に置く
+- PostgreSQL をVPSで利用する（ローカルまたはマネージド）
 
 ### 同一IPで複数ドメイン運用できる理由
 
@@ -19,9 +19,7 @@ nginxはHTTPリクエストの `Host` ヘッダを見て `server_name` ごとに
 
 - アプリ: `/var/www/accessible-scan`
 - `.env`: `/var/www/accessible-scan/.env` または `/etc/sysconfig/accessible-scan`
-- SQLite: `/var/www/accessible-scan-data/app.db`（公開ディレクトリ外）
-
-`app.db` をアプリ本体配下に置くと、将来の`rsync --delete`等で消失リスクがあるため避けてください。
+- PostgreSQL: `localhost:5432`（例）
 
 ## 3. アプリ準備（手動実行）
 
@@ -29,6 +27,7 @@ nginxはHTTPリクエストの `Host` ヘッダを見て `server_name` ごとに
 cd /var/www/accessible-scan
 npm install
 npx prisma generate
+npx prisma migrate deploy
 npm run build
 ```
 
@@ -48,7 +47,7 @@ npx playwright install chromium
 NODE_ENV=production
 PORT=3000
 APP_BASE_URL=https://access-scan.com
-DATABASE_URL=file:/srv/accessible-scan-data/app.db
+DATABASE_URL=postgresql://accessible_scan:<password>@127.0.0.1:5432/accessible_scan?schema=public
 ```
 
 ## 5. systemdで常駐化

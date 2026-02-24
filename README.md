@@ -26,13 +26,11 @@ npx playwright install chromium
 npx prisma generate
 ```
 
-4. （推奨）DB スキーマを反映
+4. DB スキーマを反映（開発）
 
 ```bash
-npx prisma db push
+npx prisma migrate dev
 ```
-
-補足: このアプリは起動時に SQLite テーブルの存在確認と作成を行うため、`db push` が未実行でも MVP 動作は可能です。
 
 ## 起動
 
@@ -104,12 +102,12 @@ npm run build
 - nginx reverse proxyで `127.0.0.1:3000` のNext.jsへ転送
 - systemdで `next start` を常駐
 
-### `.env` とSQLiteの扱い
+### `.env` とPostgreSQLの扱い
 
 - `.env` は本番配布物に含めない（Gitにコミットしない）
 - `.env.example` を雛形に本番用 `.env` を手動作成
-- SQLite DBファイルは公開ディレクトリ外に配置
-  - 例: `DATABASE_URL=file:/var/www/accessible-scan-data/app.db`
+- Postgres接続情報を `DATABASE_URL` に設定
+  - 例: `DATABASE_URL=postgresql://accessible_scan:<password>@127.0.0.1:5432/accessible_scan?schema=public`
 
 ### Playwright本番運用の注意
 
@@ -131,7 +129,7 @@ curl -i https://access-scan.com/api/health
 
 - `npm ci` / `npm test` / `npm run build`（GitHub Actions上）
 - VPSへ `rsync` 配備
-- VPSで `npm ci` / `npx prisma generate` / `npx playwright install chromium` / `npm run build`
+- VPSで `npm ci` / `npx prisma generate` / `npx prisma migrate deploy` / `npx playwright install chromium` / `npm run build`
 
 詳細手順: [`docs/cicd-github-actions.md`](docs/cicd-github-actions.md)
 

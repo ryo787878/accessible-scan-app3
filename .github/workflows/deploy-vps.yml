@@ -111,6 +111,7 @@ jobs:
           cd "${VPS_DEPLOY_PATH}"
           npm ci
           npx prisma generate
+          npx prisma migrate deploy
           npx playwright install chromium
           npm run build
           sudo -n systemctl restart accessible-scan
