@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { PageIntro } from "@/components/page-intro";
-import { PageShell } from "@/components/page-shell";
+import { MarkdownDocLayout } from "@/components/markdown-doc-layout";
 import { JsonLd } from "@/components/seo/json-ld";
 import { absoluteUrl, ogImageUrl } from "@/lib/seo/site";
 
@@ -47,17 +46,14 @@ const breadcrumbJsonLd = {
 
 export default function WcagGlossaryPage() {
   return (
-    <PageShell maxWidth="3xl">
+    <MarkdownDocLayout
+      title="WCAGとは？"
+      description="WCAGの基本概念と、Webアクセシビリティ チェックで見るべき達成基準を解説します。"
+    >
       <JsonLd data={breadcrumbJsonLd} />
-      <div className="flex flex-col gap-6">
-        <PageIntro
-          title="WCAGとは？"
-          description="WCAGの基本概念と、Webアクセシビリティ チェックで見るべき達成基準を解説します。"
-        />
-        <article className="prose prose-neutral dark:prose-invert max-w-none">
-          <p>WCAGはWeb Content Accessibility Guidelinesの略称で、アクセシビリティ実装の国際的な指針です。</p>
-        </article>
-      </div>
-    </PageShell>
+      <article className="prose prose-neutral dark:prose-invert max-w-none">
+        <p>WCAGはWeb Content Accessibility Guidelinesの略称で、アクセシビリティ実装の国際的な指針です。</p>
+      </article>
+    </MarkdownDocLayout>
   );
 }
