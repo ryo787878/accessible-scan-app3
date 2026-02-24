@@ -56,17 +56,17 @@ export function ReportRuleTable({ scan }: ReportRuleTableProps) {
                   </p>
                 ) : (
                   <div className="rounded-xl border p-2">
-                    <Table>
+                    <Table className="table-fixed">
                       <TableHeader>
                         <TableRow>
                           <TableHead className="h-12 px-4">ルール</TableHead>
-                          <TableHead className="h-12 w-24 px-4 text-center">
+                          <TableHead className="h-12 w-20 px-2 text-center md:w-24 md:px-4">
                             重大度
                           </TableHead>
-                          <TableHead className="h-12 w-24 px-4 text-right">
+                          <TableHead className="h-12 w-16 px-2 text-right md:w-24 md:px-4">
                             ページ数
                           </TableHead>
-                          <TableHead className="h-12 w-24 px-4 text-right">
+                          <TableHead className="h-12 w-16 px-2 text-right md:w-24 md:px-4">
                             要素数
                           </TableHead>
                         </TableRow>
@@ -93,7 +93,7 @@ export function ReportRuleTable({ scan }: ReportRuleTableProps) {
                               }
                             }}
                           >
-                            <TableCell className="px-4 py-4 align-top">
+                            <TableCell className="min-w-0 px-3 py-4 align-top whitespace-normal md:px-4">
                               <div className="flex flex-col gap-1.5">
                                 {(() => {
                                   const localized = getAxeRuleJa(rule.ruleId);
@@ -102,11 +102,11 @@ export function ReportRuleTable({ scan }: ReportRuleTableProps) {
                                     <>
                                       <span className="text-[15px] leading-6 font-medium">{localized}</span>
                                       {shouldShowRuleId && (
-                                        <span className="text-muted-foreground font-mono text-xs">
+                                        <span className="text-muted-foreground font-mono text-xs break-all">
                                           {rule.ruleId}
                                         </span>
                                       )}
-                                      <span className="text-muted-foreground text-xs leading-5">
+                                      <span className="text-muted-foreground text-xs leading-5 break-words">
                                         修正方法: {getQuickFixJa(rule.ruleId, rule.impact)}
                                       </span>
                                     </>
@@ -114,13 +114,13 @@ export function ReportRuleTable({ scan }: ReportRuleTableProps) {
                                 })()}
                               </div>
                             </TableCell>
-                            <TableCell className="px-4 py-4 text-center align-top">
+                            <TableCell className="px-2 py-4 text-center align-top md:px-4">
                               <SeverityBadge impact={rule.impact} />
                             </TableCell>
-                            <TableCell className="px-4 py-4 text-right font-mono align-top">
+                            <TableCell className="px-2 py-4 text-right font-mono align-top md:px-4">
                               {rule.pageCount}
                             </TableCell>
-                            <TableCell className="px-4 py-4 text-right font-mono align-top">
+                            <TableCell className="px-2 py-4 text-right font-mono align-top md:px-4">
                               {rule.nodeCount}
                             </TableCell>
                           </TableRow>
