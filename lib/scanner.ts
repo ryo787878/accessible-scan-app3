@@ -14,6 +14,7 @@ type PageFailureCode =
   | "navigation_failed"
   | "http_error"
   | "axe_failed"
+  | "axe_unavailable"
   | "non_html_content"
   | "unknown";
 
@@ -22,6 +23,19 @@ async function failPage(scanPageId: number, code: PageFailureCode, message: stri
     where: { id: scanPageId },
     data: {
       status: "failed",
+      errorCode: code,
+      errorMessage: message,
+      httpStatus,
+      finishedAt: new Date(),
+    },
+  });
+}
+
+async function skipPage(scanPageId: number, code: PageFailureCode, message: string, httpStatus?: number) {
+  await db.scanPage.update({
+    where: { id: scanPageId },
+    data: {
+      status: "skipped",
       errorCode: code,
       errorMessage: message,
       httpStatus,
@@ -87,7 +101,12 @@ async function processScanPage(scanPageId: number, pageUrl: string): Promise<voi
         await page.waitForTimeout(500);
         axe = await runAxe(page);
       } catch (retryError) {
-        await failPage(scanPageId, "axe_failed", `axe実行失敗: ${String(retryError)}`, status ?? undefined);
+        await skipPage(
+          scanPageId,
+          "axe_unavailable",
+          `axe実行失敗（このページはスキップ）: ${String(retryError)}`,
+          status ?? undefined
+        );
         return;
       }
     }

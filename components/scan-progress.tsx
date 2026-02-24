@@ -9,6 +9,7 @@ import {
   Clock,
   ArrowRight,
   ExternalLink,
+  AlertTriangle,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -46,6 +47,13 @@ function statusIcon(status: PageStatus) {
           aria-label="実行中"
         />
       );
+    case "skipped":
+      return (
+        <AlertTriangle
+          className="size-5 shrink-0 text-amber-500"
+          aria-label="スキップ"
+        />
+      );
     default:
       return (
         <Clock
@@ -64,6 +72,8 @@ function statusLabel(status: PageStatus): string {
       return "失敗";
     case "running":
       return "診断中";
+    case "skipped":
+      return "スキップ";
     default:
       return "待機中";
   }
@@ -136,13 +146,14 @@ export function ScanProgress({ publicId }: { publicId: string }) {
 
   const successCount = scan.pages.filter((p) => p.status === "success").length;
   const failedCount = scan.pages.filter((p) => p.status === "failed").length;
+  const skippedCount = scan.pages.filter((p) => p.status === "skipped").length;
   const pendingCount = scan.pages.filter(
     (p) => p.status === "pending" || p.status === "queued" || p.status === "running"
   ).length;
   const totalPages = scan.pages.length;
   const progressPercent =
     totalPages > 0
-      ? Math.round(((successCount + failedCount) / totalPages) * 100)
+      ? Math.round(((successCount + failedCount + skippedCount) / totalPages) * 100)
       : 0;
   const isCompleted = scan.status === "completed";
   const isFailed = scan.status === "failed";
@@ -206,7 +217,7 @@ export function ScanProgress({ publicId }: { publicId: string }) {
         <CardHeader>
           <CardTitle className="text-base">ページ一覧</CardTitle>
           <CardDescription>
-            {totalPages}ページ中{successCount + failedCount}ページの診断が完了
+            {totalPages}ページ中{successCount + failedCount + skippedCount}ページの診断が完了
           </CardDescription>
         </CardHeader>
         <CardContent>

@@ -68,7 +68,8 @@ export async function buildScanView(publicId: string): Promise<Scan | null> {
   const totalPages = pages.length;
   const successPages = pages.filter((p) => p.status === "success").length;
   const failedPages = pages.filter((p) => p.status === "failed").length;
-  const processedPages = successPages + failedPages;
+  const skippedPages = pages.filter((p) => p.status === "skipped").length;
+  const processedPages = successPages + failedPages + skippedPages;
 
   return {
     publicId: scan.publicId,
