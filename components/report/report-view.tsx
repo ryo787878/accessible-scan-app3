@@ -19,6 +19,7 @@ export function ReportView({ publicId }: ReportViewProps) {
   const [scan, setScan] = useState<Scan | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [focusRuleId, setFocusRuleId] = useState<string | null>(null);
 
   const fetchReport = useCallback(async (): Promise<Scan | null> => {
     try {
@@ -158,10 +159,10 @@ export function ReportView({ publicId }: ReportViewProps) {
       <ReportTopIssues scan={scan} />
 
       {/* Rule Aggregate Table */}
-      <ReportRuleTable scan={scan} />
+      <ReportRuleTable scan={scan} onRequestDetail={setFocusRuleId} />
 
       {/* Page Detail */}
-      <ReportPageDetail scan={scan} />
+      <ReportPageDetail scan={scan} focusRuleId={focusRuleId} />
 
       {/* Back action */}
       <div className="mt-4 flex flex-col items-center gap-4 border-t pt-8 md:mt-6">

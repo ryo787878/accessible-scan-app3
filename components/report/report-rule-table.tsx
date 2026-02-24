@@ -16,6 +16,7 @@ import type { Scan, Impact } from "@/lib/types";
 
 interface ReportRuleTableProps {
   scan: Scan;
+  onRequestDetail?: (ruleId: string) => void;
 }
 
 const impactTabs: { value: string; label: string }[] = [
@@ -26,19 +27,14 @@ const impactTabs: { value: string; label: string }[] = [
   { value: "minor", label: "低" },
 ];
 
-export function ReportRuleTable({ scan }: ReportRuleTableProps) {
+export function ReportRuleTable({ scan, onRequestDetail }: ReportRuleTableProps) {
   const aggregated = aggregateByRule(scan);
-  const scrollToRule = (ruleId: string) => {
-    const target = document.getElementById(`rule-${ruleId}`);
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  };
 
   return (
-    <section aria-label="ルール別集計">
+    <section id="rule-aggregate" aria-label="ルール別集計">
       <div className="flex flex-col gap-5">
         <h2 className="text-xl font-bold tracking-tight">ルール別集計</h2>
+
         <Tabs defaultValue="all">
           <TabsList className="h-auto gap-1 p-1">
             {impactTabs.map((tab) => (
@@ -64,7 +60,8 @@ export function ReportRuleTable({ scan }: ReportRuleTableProps) {
                   <div className="rounded-xl border p-2">
                     <Table className="table-fixed">
                       <TableHeader>
-                        <TableRow>
+                        {/* ヘッダー行の hover 色変化を止める */}
+                        <TableRow className="hover:bg-transparent">
                           <TableHead className="h-12 px-4">ルール</TableHead>
                           <TableHead className="h-12 w-20 px-2 text-center md:w-24 md:px-4">
                             重大度
@@ -77,47 +74,56 @@ export function ReportRuleTable({ scan }: ReportRuleTableProps) {
                           </TableHead>
                         </TableRow>
                       </TableHeader>
+
                       <TableBody>
-                        {filtered.map((rule) => (
-                          <TableRow key={rule.ruleId}>
-                            <TableCell className="min-w-0 px-3 py-4 align-top whitespace-normal md:px-4">
-                              <div className="flex flex-col gap-1.5">
-                                {(() => {
-                                  const localized = getAxeRuleJa(rule.ruleId);
-                                  const shouldShowRuleId = localized !== rule.ruleId;
-                                  return (
-                                    <>
-                                      <button
-                                        type="button"
-                                        onClick={() => scrollToRule(rule.ruleId)}
-                                        className="w-fit text-left text-[15px] leading-6 font-medium hover:underline focus-visible:underline"
-                                      >
-                                        {localized}
-                                      </button>
-                                      {shouldShowRuleId && (
-                                        <span className="text-muted-foreground font-mono text-xs break-all">
-                                          {rule.ruleId}
-                                        </span>
-                                      )}
-                                      <span className="text-muted-foreground text-xs leading-5 break-words">
-                                        修正方法: {getQuickFixJa(rule.ruleId, rule.impact)}
-                                      </span>
-                                    </>
-                                  );
-                                })()}
-                              </div>
-                            </TableCell>
-                            <TableCell className="px-2 py-4 text-center align-top md:px-4">
-                              <SeverityBadge impact={rule.impact} />
-                            </TableCell>
-                            <TableCell className="px-2 py-4 text-right font-mono align-top md:px-4">
-                              {rule.pageCount}
-                            </TableCell>
-                            <TableCell className="px-2 py-4 text-right font-mono align-top md:px-4">
-                              {rule.nodeCount}
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                        {filtered.map((rule) => {
+                          const localized = getAxeRuleJa(rule.ruleId);
+                          const shouldShowRuleId = localized !== rule.ruleId;
+
+                          return (
+                            <TableRow key={rule.ruleId}>
+                              <TableCell className="min-w-0 px-3 py-4 align-top whitespace-normal md:px-4">
+                                <div className="flex flex-col gap-1.5">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-[15px] leading-6 font-medium">
+                                      {localized}
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() => onRequestDetail?.(rule.ruleId)}
+                                      className="text-primary rounded border px-2 py-0.5 text-xs hover:bg-muted"
+                                      aria-label={`${localized} の詳細を開く`}
+                                    >
+                                      詳細
+                                    </button>
+                                  </div>
+
+                                  {shouldShowRuleId && (
+                                    <span className="text-muted-foreground font-mono text-xs break-all">
+                                      {rule.ruleId}
+                                    </span>
+                                  )}
+
+                                  <span className="text-muted-foreground text-xs leading-5 break-words">
+                                    修正方法: {getQuickFixJa(rule.ruleId, rule.impact)}
+                                  </span>
+                                </div>
+                              </TableCell>
+
+                              <TableCell className="px-2 py-4 text-center align-top md:px-4">
+                                <SeverityBadge impact={rule.impact} />
+                              </TableCell>
+
+                              <TableCell className="px-2 py-4 text-right font-mono align-top md:px-4">
+                                {rule.pageCount}
+                              </TableCell>
+
+                              <TableCell className="px-2 py-4 text-right font-mono align-top md:px-4">
+                                {rule.nodeCount}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
                       </TableBody>
                     </Table>
                   </div>

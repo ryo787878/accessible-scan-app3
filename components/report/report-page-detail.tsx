@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { getAxeRuleJa, getQuickFixJa } from "@/lib/axe-ja";
 import { SeverityBadge } from "@/components/report/severity-badge";
 import {
@@ -14,15 +15,28 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ChevronUp } from "lucide-react";
 import type { Scan } from "@/lib/types";
 
 interface ReportPageDetailProps {
   scan: Scan;
+  focusRuleId?: string | null;
 }
 
-export function ReportPageDetail({ scan }: ReportPageDetailProps) {
+const HEADER_OFFSET = 84;
+
+function scrollToElementWithOffset(elementId: string) {
+  const target = document.getElementById(elementId);
+  if (!target) return;
+  const top = target.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
+  window.scrollTo({ top, behavior: "smooth" });
+}
+
+export function ReportPageDetail({ scan, focusRuleId }: ReportPageDetailProps) {
   const successPages = scan.pages.filter((p) => p.status === "success");
   const failedPages = scan.pages.filter((p) => p.status === "failed");
+  const [openItems, setOpenItems] = useState<string[]>([]);
   const firstRuleAnchorByPage = new Map<string, Set<string>>();
 
   {
@@ -38,6 +52,29 @@ export function ReportPageDetail({ scan }: ReportPageDetailProps) {
       firstRuleAnchorByPage.set(page.url, pageAnchors);
     }
   }
+
+  const firstPageByRule = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const page of successPages) {
+      for (const violation of page.violations) {
+        if (!map.has(violation.id)) {
+          map.set(violation.id, page.url);
+        }
+      }
+    }
+    return map;
+  }, [successPages]);
+
+  useEffect(() => {
+    if (!focusRuleId) return;
+    const pageUrl = firstPageByRule.get(focusRuleId);
+    if (!pageUrl) return;
+
+    setOpenItems((prev) => (prev.includes(pageUrl) ? prev : [...prev, pageUrl]));
+    window.setTimeout(() => {
+      scrollToElementWithOffset(`rule-${focusRuleId}`);
+    }, 120);
+  }, [focusRuleId, firstPageByRule]);
 
   return (
     <section aria-label="ページ別詳細">
@@ -66,7 +103,7 @@ export function ReportPageDetail({ scan }: ReportPageDetailProps) {
           </p>
         )}
         {successPages.length > 0 && (
-          <Accordion type="multiple" className="flex flex-col gap-3">
+          <Accordion type="multiple" value={openItems} onValueChange={setOpenItems} className="flex flex-col gap-3">
             {successPages.map((page) => (
               <AccordionItem
                 key={page.url}
@@ -151,6 +188,16 @@ export function ReportPageDetail({ scan }: ReportPageDetailProps) {
             ))}
           </Accordion>
         )}
+        <div className="flex justify-center pt-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => scrollToElementWithOffset("rule-aggregate")}
+          >
+            <ChevronUp aria-hidden="true" />
+            ルール別集計へ戻る
+          </Button>
+        </div>
       </div>
     </section>
   );
