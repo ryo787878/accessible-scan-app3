@@ -31,12 +31,12 @@ export function ReportRuleTable({ scan }: ReportRuleTableProps) {
 
   return (
     <section aria-label="ルール別集計">
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-5">
         <h2 className="text-xl font-bold tracking-tight">ルール別集計</h2>
         <Tabs defaultValue="all">
-          <TabsList>
+          <TabsList className="h-auto gap-1 p-1">
             {impactTabs.map((tab) => (
-              <TabsTrigger key={tab.value} value={tab.value}>
+              <TabsTrigger key={tab.value} value={tab.value} className="px-4 py-2">
                 {tab.label}
               </TabsTrigger>
             ))}
@@ -55,18 +55,18 @@ export function ReportRuleTable({ scan }: ReportRuleTableProps) {
                     該当するルールはありません
                   </p>
                 ) : (
-                  <div className="rounded-lg border">
+                  <div className="rounded-xl border p-2">
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>ルール</TableHead>
-                          <TableHead className="w-20 text-center">
+                          <TableHead className="h-12 px-4">ルール</TableHead>
+                          <TableHead className="h-12 w-24 px-4 text-center">
                             重大度
                           </TableHead>
-                          <TableHead className="w-24 text-right">
+                          <TableHead className="h-12 w-24 px-4 text-right">
                             ページ数
                           </TableHead>
-                          <TableHead className="w-24 text-right">
+                          <TableHead className="h-12 w-24 px-4 text-right">
                             要素数
                           </TableHead>
                         </TableRow>
@@ -93,20 +93,20 @@ export function ReportRuleTable({ scan }: ReportRuleTableProps) {
                               }
                             }}
                           >
-                            <TableCell>
-                              <div className="flex flex-col gap-0.5">
+                            <TableCell className="px-4 py-4 align-top">
+                              <div className="flex flex-col gap-1.5">
                                 {(() => {
                                   const localized = getAxeRuleJa(rule.ruleId);
                                   const shouldShowRuleId = localized !== rule.ruleId;
                                   return (
                                     <>
-                                      <span className="font-medium">{localized}</span>
+                                      <span className="text-[15px] leading-6 font-medium">{localized}</span>
                                       {shouldShowRuleId && (
                                         <span className="text-muted-foreground font-mono text-xs">
                                           {rule.ruleId}
                                         </span>
                                       )}
-                                      <span className="text-muted-foreground text-xs">
+                                      <span className="text-muted-foreground text-xs leading-5">
                                         修正方法: {getQuickFixJa(rule.ruleId, rule.impact)}
                                       </span>
                                     </>
@@ -114,13 +114,13 @@ export function ReportRuleTable({ scan }: ReportRuleTableProps) {
                                 })()}
                               </div>
                             </TableCell>
-                            <TableCell className="text-center">
+                            <TableCell className="px-4 py-4 text-center align-top">
                               <SeverityBadge impact={rule.impact} />
                             </TableCell>
-                            <TableCell className="text-right font-mono">
+                            <TableCell className="px-4 py-4 text-right font-mono align-top">
                               {rule.pageCount}
                             </TableCell>
-                            <TableCell className="text-right font-mono">
+                            <TableCell className="px-4 py-4 text-right font-mono align-top">
                               {rule.nodeCount}
                             </TableCell>
                           </TableRow>
