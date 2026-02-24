@@ -20,6 +20,11 @@ export function ReportView({ publicId }: ReportViewProps) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [focusRuleId, setFocusRuleId] = useState<string | null>(null);
+  const handleRequestDetail = (ruleId: string) => {
+    // Allow selecting the same rule repeatedly.
+    setFocusRuleId(null);
+    window.setTimeout(() => setFocusRuleId(ruleId), 0);
+  };
 
   const fetchReport = useCallback(async (): Promise<Scan | null> => {
     try {
@@ -159,10 +164,14 @@ export function ReportView({ publicId }: ReportViewProps) {
       <ReportTopIssues scan={scan} />
 
       {/* Rule Aggregate Table */}
-      <ReportRuleTable scan={scan} onRequestDetail={setFocusRuleId} />
+      <ReportRuleTable scan={scan} onRequestDetail={handleRequestDetail} />
 
       {/* Page Detail */}
-      <ReportPageDetail scan={scan} focusRuleId={focusRuleId} />
+      <ReportPageDetail
+        scan={scan}
+        focusRuleId={focusRuleId}
+        onFocusHandled={() => setFocusRuleId(null)}
+      />
 
       {/* Back action */}
       <div className="mt-4 flex flex-col items-center gap-4 border-t pt-8 md:mt-6">

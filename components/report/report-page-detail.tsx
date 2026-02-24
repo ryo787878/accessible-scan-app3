@@ -22,6 +22,7 @@ import type { Scan } from "@/lib/types";
 interface ReportPageDetailProps {
   scan: Scan;
   focusRuleId?: string | null;
+  onFocusHandled?: () => void;
 }
 
 const HEADER_OFFSET = 84;
@@ -33,7 +34,11 @@ function scrollToElementWithOffset(elementId: string) {
   window.scrollTo({ top, behavior: "smooth" });
 }
 
-export function ReportPageDetail({ scan, focusRuleId }: ReportPageDetailProps) {
+export function ReportPageDetail({
+  scan,
+  focusRuleId,
+  onFocusHandled,
+}: ReportPageDetailProps) {
   const sectionRef = useRef<HTMLElement | null>(null);
   const successPages = scan.pages.filter((p) => p.status === "success");
   const failedPages = scan.pages.filter((p) => p.status === "failed");
@@ -75,8 +80,9 @@ export function ReportPageDetail({ scan, focusRuleId }: ReportPageDetailProps) {
     setOpenItems((prev) => (prev.includes(pageUrl) ? prev : [...prev, pageUrl]));
     window.setTimeout(() => {
       scrollToElementWithOffset(`rule-${focusRuleId}`);
+      onFocusHandled?.();
     }, 120);
-  }, [focusRuleId, firstPageByRule]);
+  }, [focusRuleId, firstPageByRule, onFocusHandled]);
 
   useEffect(() => {
     const onScroll = () => {
