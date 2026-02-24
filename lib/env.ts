@@ -17,6 +17,7 @@ export const env = {
   scanMaxPagesLimit: toPositiveInt(process.env.SCAN_MAX_PAGES_LIMIT, 20),
   scanConcurrency: toPositiveInt(process.env.SCAN_CONCURRENCY, 2),
   scanPageTimeoutMs: toPositiveInt(process.env.SCAN_PAGE_TIMEOUT_MS, 30_000),
+  scanStaleAfterMs: toPositiveInt(process.env.SCAN_STALE_AFTER_MS, 15 * 60_000),
   rateLimitWindowMs: toPositiveInt(process.env.RATE_LIMIT_WINDOW_MS, 60_000),
   rateLimitMax: toPositiveInt(process.env.RATE_LIMIT_MAX, 5),
   logLevel: toLogLevel(process.env.LOG_LEVEL),

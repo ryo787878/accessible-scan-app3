@@ -5,6 +5,7 @@ import { validateInput } from "@/lib/validation";
 import { db } from "@/lib/db";
 import { enqueueScanJob } from "@/lib/jobs";
 import { ensureDbSchema } from "@/lib/db-init";
+import { recoverStaleScans } from "@/lib/scan-recovery";
 
 export async function POST(request: NextRequest) {
   const ip =
@@ -32,6 +33,7 @@ export async function POST(request: NextRequest) {
 
   try {
     await ensureDbSchema();
+    await recoverStaleScans();
     const validated = await validateInput(body);
 
     const scan = await db.scan.create({

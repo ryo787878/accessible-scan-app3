@@ -2,6 +2,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 
 const mockCreate = vi.fn();
+const mockFindMany = vi.fn();
+const mockScanUpdate = vi.fn();
+const mockScanPageUpdateMany = vi.fn();
 const mockEnqueue = vi.fn();
 const mockValidateInput = vi.fn();
 const mockBuildScanView = vi.fn();
@@ -11,6 +14,11 @@ vi.mock("@/lib/db", () => ({
   db: {
     scan: {
       create: mockCreate,
+      findMany: mockFindMany,
+      update: mockScanUpdate,
+    },
+    scanPage: {
+      updateMany: mockScanPageUpdateMany,
     },
   },
 }));
@@ -35,6 +43,9 @@ vi.mock("@/lib/db-init", () => ({
 describe("scan api routes", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockFindMany.mockResolvedValue([]);
+    mockScanUpdate.mockResolvedValue(undefined);
+    mockScanPageUpdateMany.mockResolvedValue({ count: 0 });
   });
 
   it("POST /api/scans returns 201", async () => {

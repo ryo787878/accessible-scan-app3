@@ -2,6 +2,7 @@ import type { Scan, ScanReportResponse, Violation } from "@/lib/types";
 import { db } from "@/lib/db";
 import { impactToJa } from "@/lib/i18n-ja";
 import { ensureDbSchema } from "@/lib/db-init";
+import { recoverStaleScans } from "@/lib/scan-recovery";
 
 function parseJsonArray<T>(json: string, fallback: T): T {
   try {
@@ -34,6 +35,7 @@ function toPageStatus(status: string): NonNullable<Scan["pages"]>[number]["statu
 
 export async function buildScanView(publicId: string): Promise<Scan | null> {
   await ensureDbSchema();
+  await recoverStaleScans();
   const scan = await db.scan.findUnique({
     where: { publicId },
     include: {
