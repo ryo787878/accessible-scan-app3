@@ -37,7 +37,11 @@ async function processScanPage(scanPageId: number, pageUrl: string): Promise<voi
   });
 
   const browser = await chromium.launch({ headless: true });
-  const context = await browser.newContext();
+  const context = await browser.newContext({
+    // Some production sites enforce strict CSP (no eval/inline script).
+    // axe injection requires script execution in page context.
+    bypassCSP: true,
+  });
   const page = await context.newPage();
 
   try {
