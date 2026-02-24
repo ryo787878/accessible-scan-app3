@@ -116,5 +116,30 @@ jobs:
           npx prisma generate
           npm run build
           sudo -n systemctl restart accessible-scan
-          curl -fsS http://127.0.0.1:3000/api/health >/dev/null
+
+          # Wait for service to become active
+          for i in {1..20}; do
+            if systemctl is-active --quiet accessible-scan; then
+              break
+            fi
+            sleep 1
+          done
+
+          if ! systemctl is-active --quiet accessible-scan; then
+            systemctl status --no-pager accessible-scan || true
+            journalctl -u accessible-scan -n 80 --no-pager || true
+            exit 1
+          fi
+
+          # Wait for health endpoint
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:3000/api/health >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+
+          systemctl status --no-pager accessible-scan || true
+          journalctl -u accessible-scan -n 80 --no-pager || true
+          exit 1
           EOSSH
