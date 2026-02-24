@@ -30,7 +30,7 @@ const features = [
 
 export default function HomePage() {
   return (
-    <main className="flex min-h-[calc(100vh-3.5rem)] flex-col items-center px-4 py-10 md:py-16">
+    <main className="flex min-h-[calc(100vh-3.5rem)] flex-col items-center px-4 py-10 md:py-10">
       <div className="flex w-full max-w-3xl flex-col gap-12">
         {/* Hero */}
         <section className="flex flex-col items-center gap-4 text-center">
