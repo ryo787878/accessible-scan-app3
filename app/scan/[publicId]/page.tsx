@@ -9,7 +9,7 @@ export default async function ScanPage({
   const { publicId } = await params;
 
   return (
-    <main className="flex min-h-screen flex-col items-center px-4 py-12 md:py-10">
+    <main className="flex min-h-screen flex-col items-center px-4 py-12 md:py-5">
       <div className="flex w-full max-w-3xl flex-col gap-6">
         <nav aria-label="パンくずリスト">
           <ol className="text-muted-foreground flex items-center gap-1.5 text-sm">
