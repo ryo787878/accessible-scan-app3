@@ -8,6 +8,7 @@ import { ReportSummary } from "@/components/report/report-summary";
 import { ReportTopIssues } from "@/components/report/report-top-issues";
 import { ReportRuleTable } from "@/components/report/report-rule-table";
 import { ReportPageDetail } from "@/components/report/report-page-detail";
+import { ScoreOverview } from "@/components/report/score-overview";
 import type { Scan, ScanReportResponse } from "@/lib/types";
 
 interface ReportViewProps {
@@ -147,6 +148,7 @@ export function ReportView({ publicId }: ReportViewProps) {
             {scan.pages.filter((p) => p.status === "success").length}ページ診断完了
           </span>
         </div>
+        <ScoreOverview scan={scan} />
       </div>
 
       {/* Summary */}
