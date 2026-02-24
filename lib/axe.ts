@@ -15,6 +15,32 @@ type AxeRunResult = {
   }>;
 };
 
+type AxeRuntimeState = {
+  hasAxe: boolean;
+  axeType: string;
+  hasModule: boolean;
+  hasExports: boolean;
+  hasDefine: boolean;
+  readyState: string;
+  cspMeta: string | null;
+};
+
+async function getAxeRuntimeState(page: Page): Promise<AxeRuntimeState> {
+  return page.evaluate(() => {
+    const w = window as unknown as Record<string, unknown>;
+    const meta = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
+    return {
+      hasAxe: Boolean((w as { axe?: unknown }).axe),
+      axeType: typeof (w as { axe?: unknown }).axe,
+      hasModule: typeof (w as { module?: unknown }).module !== "undefined",
+      hasExports: typeof (w as { exports?: unknown }).exports !== "undefined",
+      hasDefine: typeof (w as { define?: unknown }).define !== "undefined",
+      readyState: document.readyState,
+      cspMeta: meta?.getAttribute("content") ?? null,
+    };
+  });
+}
+
 async function resetAxeRuntime(page: Page): Promise<void> {
   await page.evaluate(() => {
     const w = window as unknown as Record<string, unknown>;
@@ -93,17 +119,21 @@ export async function runAxe(page: Page, pageUrl?: string): Promise<AxeRunResult
     try {
       return await runAxeViaScriptTag(page);
     } catch (secondError) {
+      const stateAfterScriptTag = await getAxeRuntimeState(page).catch(() => null);
       logger.warn("axe scriptTag fallback failed", {
         pageUrl: pageUrl ?? page.url(),
         error: secondError instanceof Error ? secondError.message : String(secondError),
+        runtimeState: stateAfterScriptTag,
       });
 
       try {
         return await runAxeViaWrappedSource(page);
       } catch (thirdError) {
+        const stateAfterWrapped = await getAxeRuntimeState(page).catch(() => null);
         logger.warn("axe wrappedSource fallback failed", {
           pageUrl: pageUrl ?? page.url(),
           error: thirdError instanceof Error ? thirdError.message : String(thirdError),
+          runtimeState: stateAfterWrapped,
         });
 
         const firstMessage = firstError instanceof Error ? firstError.message : String(firstError);
