@@ -108,6 +108,7 @@ curl -i https://access-scan.com/api/health
 
 - `npm ci` / `npm test` / `npm run build`（GitHub Actions上）
 - VPSへ `rsync` 配備
+- VPSで `npm ci` / `npx prisma generate` / `npx playwright install chromium` / `npm run build`
 
 詳細手順: [`docs/cicd-github-actions.md`](docs/cicd-github-actions.md)
 

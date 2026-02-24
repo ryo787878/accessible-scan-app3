@@ -29,3 +29,4 @@ Secrets（推奨）:
 
 1. main に push
 2. GitHub Actions の `Deploy to VPS` が成功すること
+3. VPS側で `npx playwright install chromium` が実行されていること（workflow内）
