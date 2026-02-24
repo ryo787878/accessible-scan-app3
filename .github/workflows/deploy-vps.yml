@@ -80,9 +80,7 @@ jobs:
           PROD_ENV_FILE: ${{ secrets.PROD_ENV_FILE }}
         run: |
           if [ -n "${PROD_ENV_FILE:-}" ]; then
-            ssh -p "${VPS_PORT:-22}" -i ~/.ssh/id_ed25519 "${VPS_USER}@${VPS_HOST}" "umask 077 && cat > '${VPS_DEPLOY_PATH}/.env'" <<EOF
-${PROD_ENV_FILE}
-EOF
+            printf '%s\n' "${PROD_ENV_FILE}" | ssh -p "${VPS_PORT:-22}" -i ~/.ssh/id_ed25519 "${VPS_USER}@${VPS_HOST}" "umask 077 && cat > '${VPS_DEPLOY_PATH}/.env'"
           fi
 
           ssh -p "${VPS_PORT:-22}" -i ~/.ssh/id_ed25519 "${VPS_USER}@${VPS_HOST}" \
