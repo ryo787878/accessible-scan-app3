@@ -1,6 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import axeCore from "axe-core";
 import type { Page } from "playwright";
+import { logger } from "@/lib/logger";
 
 type AxeRunResult = {
   violations: Array<{
@@ -80,16 +81,31 @@ async function runAxeViaWrappedSource(page: Page): Promise<AxeRunResult> {
   }) as Promise<AxeRunResult>;
 }
 
-export async function runAxe(page: Page): Promise<AxeRunResult> {
+export async function runAxe(page: Page, pageUrl?: string): Promise<AxeRunResult> {
   try {
     return (await new AxeBuilder({ page }).analyze()) as unknown as AxeRunResult;
   } catch (firstError) {
+    logger.warn("axe builder failed", {
+      pageUrl: pageUrl ?? page.url(),
+      error: firstError instanceof Error ? firstError.message : String(firstError),
+    });
+
     try {
       return await runAxeViaScriptTag(page);
     } catch (secondError) {
+      logger.warn("axe scriptTag fallback failed", {
+        pageUrl: pageUrl ?? page.url(),
+        error: secondError instanceof Error ? secondError.message : String(secondError),
+      });
+
       try {
         return await runAxeViaWrappedSource(page);
       } catch (thirdError) {
+        logger.warn("axe wrappedSource fallback failed", {
+          pageUrl: pageUrl ?? page.url(),
+          error: thirdError instanceof Error ? thirdError.message : String(thirdError),
+        });
+
         const firstMessage = firstError instanceof Error ? firstError.message : String(firstError);
         const secondMessage = secondError instanceof Error ? secondError.message : String(secondError);
         const thirdMessage = thirdError instanceof Error ? thirdError.message : String(thirdError);

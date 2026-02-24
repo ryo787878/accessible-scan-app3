@@ -18,6 +18,76 @@ type PageFailureCode =
   | "non_html_content"
   | "unknown";
 
+const MAX_TEXT_FIELD_CHARS = 3000;
+const MAX_TARGET_ENTRIES = 30;
+const MAX_TARGET_ENTRY_CHARS = 500;
+
+function truncateText(value: string, maxChars = MAX_TEXT_FIELD_CHARS): string {
+  return value.length > maxChars ? `${value.slice(0, maxChars)}...` : value;
+}
+
+function sanitizeNode(raw: Record<string, unknown>): {
+  html: string;
+  target: string[];
+  failureSummary: string;
+} {
+  const html = typeof raw.html === "string" ? truncateText(raw.html) : "";
+  const failureSummary = typeof raw.failureSummary === "string" ? truncateText(raw.failureSummary) : "";
+  const target = Array.isArray(raw.target)
+    ? raw.target
+        .filter((item): item is string => typeof item === "string")
+        .slice(0, MAX_TARGET_ENTRIES)
+        .map((item) => truncateText(item, MAX_TARGET_ENTRY_CHARS))
+    : [];
+
+  return { html, target, failureSummary };
+}
+
+function sanitizeViolationsForStorage(
+  violations: Array<{
+    id: string;
+    impact?: string | null;
+    description: string;
+    help: string;
+    helpUrl: string;
+    tags?: string[];
+    nodes: Array<Record<string, unknown>>;
+  }>
+) {
+  return violations.slice(0, env.scanMaxViolationsPerPage).map((v) => {
+    const sanitizedNodes = v.nodes.slice(0, env.scanMaxNodesPerViolation).map(sanitizeNode);
+
+    return {
+      id: truncateText(v.id, 120),
+      impact: v.impact ?? null,
+      description: truncateText(v.description, 500),
+      help: truncateText(v.help, 500),
+      helpUrl: truncateText(v.helpUrl, 1000),
+      tags: Array.isArray(v.tags) ? v.tags.slice(0, 30).map((tag) => truncateText(tag, 80)) : [],
+      nodes: sanitizedNodes,
+    };
+  });
+}
+
+async function createHostSafetyChecker() {
+  const cache = new Map<string, boolean>();
+
+  return async (hostname: string): Promise<boolean> => {
+    const lower = hostname.toLowerCase();
+    const cached = cache.get(lower);
+    if (cached !== undefined) return cached;
+
+    try {
+      await assertSafeHostname(lower);
+      cache.set(lower, true);
+      return true;
+    } catch {
+      cache.set(lower, false);
+      return false;
+    }
+  };
+}
+
 async function failPage(scanPageId: number, code: PageFailureCode, message: string, httpStatus?: number) {
   await db.scanPage.update({
     where: { id: scanPageId },
@@ -57,6 +127,7 @@ async function processScanPage(scanPageId: number, pageUrl: string): Promise<voi
     bypassCSP: true,
   });
   const page = await context.newPage();
+  const isSafeHost = await createHostSafetyChecker();
 
   try {
     page.setDefaultNavigationTimeout(env.scanPageTimeoutMs);
@@ -64,6 +135,27 @@ async function processScanPage(scanPageId: number, pageUrl: string): Promise<voi
 
     const initialHost = new URL(pageUrl).hostname;
     await assertSafeHostname(initialHost);
+
+    await context.route("**/*", async (route) => {
+      const requestUrl = route.request().url();
+
+      try {
+        const parsed = new URL(requestUrl);
+        const protocol = parsed.protocol.toLowerCase();
+        if (protocol !== "http:" && protocol !== "https:") {
+          return route.abort();
+        }
+
+        const safe = await isSafeHost(parsed.hostname);
+        if (!safe) {
+          return route.abort();
+        }
+      } catch {
+        return route.abort();
+      }
+
+      return route.continue();
+    });
 
     const response = await page.goto(pageUrl, {
       timeout: env.scanPageTimeoutMs,
@@ -95,11 +187,16 @@ async function processScanPage(scanPageId: number, pageUrl: string): Promise<voi
 
     let axe;
     try {
-      axe = await runAxe(page);
+      axe = await runAxe(page, pageUrl);
     } catch (error) {
+      logger.warn("axe run failed; retrying once", {
+        scanPageId,
+        pageUrl,
+        error: error instanceof Error ? error.message : String(error),
+      });
       try {
         await page.waitForTimeout(500);
-        axe = await runAxe(page);
+        axe = await runAxe(page, pageUrl);
       } catch (retryError) {
         await skipPage(
           scanPageId,
@@ -107,13 +204,20 @@ async function processScanPage(scanPageId: number, pageUrl: string): Promise<voi
           `axe実行失敗（このページはスキップ）: ${String(retryError)}`,
           status ?? undefined
         );
+        logger.warn("page skipped due to axe unavailable", {
+          scanPageId,
+          pageUrl,
+          error: retryError instanceof Error ? retryError.message : String(retryError),
+        });
         return;
       }
     }
 
-    if (axe.violations.length > 0) {
+    const violations = sanitizeViolationsForStorage(axe.violations);
+
+    if (violations.length > 0) {
       await db.axeViolation.createMany({
-        data: axe.violations.map((v) => ({
+        data: violations.map((v) => ({
           scanPageId,
           ruleId: v.id,
           impact: v.impact ?? null,
