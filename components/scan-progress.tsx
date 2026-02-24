@@ -125,7 +125,9 @@ export function ScanProgress({ publicId }: { publicId: string }) {
           <p className="text-muted-foreground">{error}</p>
         </div>
         <Button asChild variant="outline">
-          <Link href="/">トップページに戻る</Link>
+          <Link href="/" scroll>
+            トップページに戻る
+          </Link>
         </Button>
       </div>
     );
@@ -243,7 +245,7 @@ export function ScanProgress({ publicId }: { publicId: string }) {
       {/* Action button */}
       {isCompleted && (
         <Button asChild size="lg" className="w-full text-base">
-          <Link href={`/report/${publicId}`}>
+          <Link href={`/report/${publicId}`} scroll>
             レポートを見る
             <ArrowRight aria-hidden="true" />
           </Link>
@@ -256,7 +258,7 @@ export function ScanProgress({ publicId }: { publicId: string }) {
             一部のページで診断に失敗しました。完了した結果をレポートで確認できます。
           </p>
           <Button asChild size="lg" variant="outline" className="w-full text-base">
-            <Link href={`/report/${publicId}`}>
+            <Link href={`/report/${publicId}`} scroll>
               レポートを見る
               <ArrowRight aria-hidden="true" />
             </Link>

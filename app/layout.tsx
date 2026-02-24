@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { JsonLd } from "@/components/seo/json-ld";
+import { ScrollToTopOnRouteChange } from "@/components/scroll-to-top-on-route-change";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, absoluteUrl, ogImageUrl, siteUrl } from "@/lib/seo/site";
 import "./globals.css";
 
@@ -117,6 +118,7 @@ export default function RootLayout({
         ) : null}
         <JsonLd data={organizationJsonLd} />
         <JsonLd data={softwareApplicationJsonLd} />
+        <ScrollToTopOnRouteChange />
         <SiteHeader />
         {children}
         <SiteFooter />

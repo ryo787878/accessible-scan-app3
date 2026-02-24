@@ -87,7 +87,7 @@ export function ScanForm() {
       toast.success("診断を開始しました", {
         description: "診断の進捗をリアルタイムで確認できます",
       });
-      router.push(`/scan/${data.publicId}`);
+      router.push(`/scan/${data.publicId}`, { scroll: true });
     } catch {
       toast.error("通信エラー", {
         description: "サーバーとの通信に失敗しました。しばらく経ってから再試行してください。",

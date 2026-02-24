@@ -105,10 +105,14 @@ export function ReportView({ publicId }: ReportViewProps) {
         </div>
         <div className="flex gap-3">
           <Button asChild variant="outline">
-            <Link href="/">トップページに戻る</Link>
+            <Link href="/" scroll>
+              トップページに戻る
+            </Link>
           </Button>
           <Button asChild variant="outline">
-            <Link href={`/scan/${publicId}`}>進捗ページへ</Link>
+            <Link href={`/scan/${publicId}`} scroll>
+              進捗ページへ
+            </Link>
           </Button>
         </div>
       </div>
@@ -176,7 +180,7 @@ export function ReportView({ publicId }: ReportViewProps) {
       {/* Back action */}
       <div className="mt-4 flex flex-col items-center gap-4 border-t pt-8 md:mt-6">
         <Button asChild variant="outline" size="lg">
-          <Link href="/">
+          <Link href="/" scroll>
             <ArrowLeft aria-hidden="true" />
             新しい診断を開始
           </Link>
