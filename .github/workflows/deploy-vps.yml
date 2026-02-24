@@ -100,3 +100,21 @@ jobs:
             --exclude '.env' \
             -e "ssh -p ${VPS_PORT:-22} -i ~/.ssh/id_ed25519" \
             ./ "${VPS_USER}@${VPS_HOST}:${VPS_DEPLOY_PATH}/"
+
+      - name: Build and restart on VPS
+        env:
+          VPS_HOST: ${{ vars.VPS_HOST }}
+          VPS_PORT: ${{ vars.VPS_PORT }}
+          VPS_USER: ${{ vars.VPS_USER }}
+          VPS_DEPLOY_PATH: ${{ vars.VPS_DEPLOY_PATH }}
+        run: |
+          ssh -p "${VPS_PORT:-22}" -i ~/.ssh/id_ed25519 "${VPS_USER}@${VPS_HOST}" \
+            "VPS_DEPLOY_PATH='${VPS_DEPLOY_PATH}' bash -s" <<'EOSSH'
+          set -euo pipefail
+          cd "${VPS_DEPLOY_PATH}"
+          npm ci
+          npx prisma generate
+          npm run build
+          sudo -n systemctl restart accessible-scan
+          curl -fsS http://127.0.0.1:3000/api/health >/dev/null
+          EOSSH
