@@ -164,7 +164,7 @@ export function ReportView({ publicId }: ReportViewProps) {
       <ReportPageDetail scan={scan} />
 
       {/* Back action */}
-      <div className="flex flex-col items-center gap-4 border-t pt-8">
+      <div className="mt-4 flex flex-col items-center gap-4 border-t pt-8 md:mt-6">
         <Button asChild variant="outline" size="lg">
           <Link href="/">
             <ArrowLeft aria-hidden="true" />
