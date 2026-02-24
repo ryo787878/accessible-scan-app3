@@ -39,13 +39,13 @@ export default async function ReportPage({
                 トップ
               </Link>
             </li>
-            <li aria-hidden="true">/</li>
+            <li aria-hidden="true">{">"}</li>
             <li>
               <Link href={`/scan/${publicId}`} className="hover:text-foreground transition-colors">
                 診断進捗
               </Link>
             </li>
-            <li aria-hidden="true">/</li>
+            <li aria-hidden="true">{">"}</li>
             <li className="text-foreground font-medium">レポート</li>
           </ol>
         </nav>

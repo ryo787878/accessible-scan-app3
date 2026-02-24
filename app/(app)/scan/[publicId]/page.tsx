@@ -39,7 +39,7 @@ export default async function ScanPage({
                 トップ
               </Link>
             </li>
-            <li aria-hidden="true">/</li>
+            <li aria-hidden="true">{">"}</li>
             <li className="text-foreground font-medium">診断進捗</li>
           </ol>
         </nav>
