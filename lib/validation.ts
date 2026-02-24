@@ -23,7 +23,14 @@ function isPrivateIPv4(ip: string): boolean {
 
 function isPrivateIPv6(ip: string): boolean {
   const lower = ip.toLowerCase();
+  if (lower === "::") return true;
   if (lower === "::1") return true;
+  if (lower.startsWith("::ffff:")) {
+    const mapped = lower.slice("::ffff:".length);
+    if (net.isIP(mapped) === 4) {
+      return isPrivateIPv4(mapped);
+    }
+  }
   if (lower.startsWith("fc") || lower.startsWith("fd")) return true;
   if (lower.startsWith("fe8") || lower.startsWith("fe9") || lower.startsWith("fea") || lower.startsWith("feb")) return true;
   return false;

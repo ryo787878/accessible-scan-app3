@@ -1,6 +1,16 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
+function withSecurityHeaders(response: NextResponse): NextResponse {
+  response.headers.set("X-Content-Type-Options", "nosniff");
+  response.headers.set("X-Frame-Options", "DENY");
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  response.headers.set("Cross-Origin-Opener-Policy", "same-origin");
+  response.headers.set("Cross-Origin-Resource-Policy", "same-origin");
+  response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  return response;
+}
+
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -13,10 +23,10 @@ export function proxy(request: NextRequest) {
   ) {
     const url = request.nextUrl.clone();
     url.pathname = pathname.replace(/\/+$/, "");
-    return NextResponse.redirect(url, 308);
+    return withSecurityHeaders(NextResponse.redirect(url, 308));
   }
 
-  return NextResponse.next();
+  return withSecurityHeaders(NextResponse.next());
 }
 
 export const config = {

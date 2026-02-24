@@ -6,6 +6,8 @@ describe("validation", () => {
     expect(isForbiddenHost("localhost")).toBe(true);
     expect(isForbiddenHost("127.0.0.1")).toBe(true);
     expect(isForbiddenHost("10.0.0.1")).toBe(true);
+    expect(isForbiddenHost("::1")).toBe(true);
+    expect(isForbiddenHost("::ffff:127.0.0.1")).toBe(true);
   });
 
   it("accepts valid public input", async () => {

@@ -43,6 +43,7 @@ vi.mock("@/lib/db-init", () => ({
 describe("scan api routes", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockEnqueue.mockReturnValue({ accepted: true });
     mockFindMany.mockResolvedValue([]);
     mockScanUpdate.mockResolvedValue(undefined);
     mockScanPageUpdateMany.mockResolvedValue({ count: 0 });
@@ -55,7 +56,7 @@ describe("scan api routes", () => {
       maxPages: 10,
     });
     mockCreate.mockResolvedValue({
-      publicId: "scan_abc123",
+      publicId: "scan_abc123def4",
       status: "queued",
     });
 
@@ -78,8 +79,8 @@ describe("scan api routes", () => {
     const body = await res.json();
 
     expect(res.status).toBe(201);
-    expect(body.publicId).toBe("scan_abc123");
-    expect(mockEnqueue).toHaveBeenCalledWith("scan_abc123");
+    expect(body.publicId).toBe("scan_abc123def4");
+    expect(mockEnqueue).toHaveBeenCalledWith("scan_abc123def4");
   });
 
   it("POST /api/scans returns 400 for invalid url", async () => {
@@ -107,9 +108,62 @@ describe("scan api routes", () => {
     expect(body.error).toBe("Invalid URL");
   });
 
+  it("POST /api/scans returns 415 for non-json content type", async () => {
+    const { POST } = await import("@/app/api/scans/route");
+    const req = new NextRequest("http://localhost/api/scans", {
+      method: "POST",
+      headers: {
+        "content-type": "text/plain",
+      },
+      body: "hello",
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(415);
+  });
+
+  it("POST /api/scans returns 403 for cross-origin request", async () => {
+    const { POST } = await import("@/app/api/scans/route");
+    const req = new NextRequest("http://localhost/api/scans", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        host: "localhost",
+        origin: "https://evil.example",
+      },
+      body: JSON.stringify({
+        url: "https://example.com",
+        hasAuthorization: true,
+        acceptedTerms: true,
+      }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(403);
+  });
+
+  it("POST /api/scans returns 413 for oversized body", async () => {
+    const { POST } = await import("@/app/api/scans/route");
+    const req = new NextRequest("http://localhost/api/scans", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "content-length": String(16 * 1024 + 1),
+      },
+      body: JSON.stringify({
+        url: "https://example.com",
+        hasAuthorization: true,
+        acceptedTerms: true,
+      }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(413);
+  });
+
   it("GET /api/scans/[publicId] returns status", async () => {
     mockBuildScanView.mockResolvedValue({
-      publicId: "scan_abc123",
+      publicId: "scan_abc123def4",
       status: "running",
       url: "https://example.com",
       maxPages: 10,
@@ -126,7 +180,7 @@ describe("scan api routes", () => {
 
     const { GET } = await import("@/app/api/scans/[publicId]/route");
     const res = await GET(new Request("http://localhost"), {
-      params: Promise.resolve({ publicId: "scan_abc123" }),
+      params: Promise.resolve({ publicId: "scan_abc123def4" }),
     });
     const body = await res.json();
 
@@ -135,9 +189,18 @@ describe("scan api routes", () => {
     expect(body.progress.processedPages).toBe(3);
   });
 
+  it("GET /api/scans/[publicId] returns 400 for invalid id", async () => {
+    const { GET } = await import("@/app/api/scans/[publicId]/route");
+    const res = await GET(new Request("http://localhost"), {
+      params: Promise.resolve({ publicId: "invalid" }),
+    });
+
+    expect(res.status).toBe(400);
+  });
+
   it("GET /api/scans/[publicId]/report returns report", async () => {
     mockBuildScanReport.mockResolvedValue({
-      publicId: "scan_abc123",
+      publicId: "scan_abc123def4",
       status: "completed",
       summary: {
         inputUrl: "https://example.com",
@@ -159,12 +222,21 @@ describe("scan api routes", () => {
 
     const { GET } = await import("@/app/api/scans/[publicId]/report/route");
     const res = await GET(new Request("http://localhost"), {
-      params: Promise.resolve({ publicId: "scan_abc123" }),
+      params: Promise.resolve({ publicId: "scan_abc123def4" }),
     });
     const body = await res.json();
 
     expect(res.status).toBe(200);
-    expect(body.publicId).toBe("scan_abc123");
+    expect(body.publicId).toBe("scan_abc123def4");
     expect(body.status).toBe("completed");
+  });
+
+  it("GET /api/scans/[publicId]/report returns 400 for invalid id", async () => {
+    const { GET } = await import("@/app/api/scans/[publicId]/report/route");
+    const res = await GET(new Request("http://localhost"), {
+      params: Promise.resolve({ publicId: "invalid" }),
+    });
+
+    expect(res.status).toBe(400);
   });
 });
