@@ -45,12 +45,10 @@ jobs:
           VPS_PORT: ${{ vars.VPS_PORT }}
           VPS_USER: ${{ vars.VPS_USER }}
           VPS_DEPLOY_PATH: ${{ vars.VPS_DEPLOY_PATH }}
-          VPS_SYSTEMD_SERVICE: ${{ vars.VPS_SYSTEMD_SERVICE }}
-          APP_HEALTHCHECK_URL: ${{ vars.APP_HEALTHCHECK_URL }}
           VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
         run: |
           set -euo pipefail
-          required_vars=(VPS_HOST VPS_USER VPS_DEPLOY_PATH VPS_SYSTEMD_SERVICE APP_HEALTHCHECK_URL)
+          required_vars=(VPS_HOST VPS_USER VPS_DEPLOY_PATH)
           for name in "${required_vars[@]}"; do
             if [ -z "${!name:-}" ]; then
               echo "Missing required GitHub Variable: $name"
@@ -102,38 +100,3 @@ jobs:
             --exclude '.env' \
             -e "ssh -p ${VPS_PORT:-22} -i ~/.ssh/id_ed25519" \
             ./ "${VPS_USER}@${VPS_HOST}:${VPS_DEPLOY_PATH}/"
-
-      - name: Deploy on VPS
-        env:
-          VPS_HOST: ${{ vars.VPS_HOST }}
-          VPS_PORT: ${{ vars.VPS_PORT }}
-          VPS_USER: ${{ vars.VPS_USER }}
-          VPS_DEPLOY_PATH: ${{ vars.VPS_DEPLOY_PATH }}
-          VPS_SYSTEMD_SERVICE: ${{ vars.VPS_SYSTEMD_SERVICE }}
-          APP_HEALTHCHECK_URL: ${{ vars.APP_HEALTHCHECK_URL }}
-          PROD_ENV_FILE: ${{ secrets.PROD_ENV_FILE }}
-        run: |
-          if [ -n "${PROD_ENV_FILE:-}" ]; then
-            printf '%s\n' "${PROD_ENV_FILE}" | ssh -p "${VPS_PORT:-22}" -i ~/.ssh/id_ed25519 "${VPS_USER}@${VPS_HOST}" "umask 077 && cat > '${VPS_DEPLOY_PATH}/.env'"
-          fi
-
-          ssh -p "${VPS_PORT:-22}" -i ~/.ssh/id_ed25519 "${VPS_USER}@${VPS_HOST}" \
-            "VPS_DEPLOY_PATH='${VPS_DEPLOY_PATH}' VPS_SYSTEMD_SERVICE='${VPS_SYSTEMD_SERVICE}' APP_HEALTHCHECK_URL='${APP_HEALTHCHECK_URL}' bash -s" <<'EOSSH'
-          set -euo pipefail
-
-          cd "${VPS_DEPLOY_PATH}"
-
-          npm ci
-          npx prisma generate
-          npm run build
-
-          sudo -n systemctl restart "${VPS_SYSTEMD_SERVICE:-accessible-scan}"
-          sudo -n nginx -t
-          sudo -n systemctl reload nginx
-
-          if [ -n "${APP_HEALTHCHECK_URL:-}" ]; then
-            curl -fsS "${APP_HEALTHCHECK_URL}"
-          else
-            curl -fsS http://127.0.0.1:3000/api/health
-          fi
-          EOSSH

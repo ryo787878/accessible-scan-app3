@@ -108,10 +108,6 @@ curl -i https://access-scan.com/api/health
 
 - `npm ci` / `npm test` / `npm run build`（GitHub Actions上）
 - VPSへ `rsync` 配備
-- VPSで `npm ci` / `npx prisma generate` / `npm run build`
-- `systemctl restart accessible-scan`
-- `nginx -t` と `nginx reload`
-- `GET /api/health` で最終確認
 
 詳細手順: [`docs/cicd-github-actions.md`](docs/cicd-github-actions.md)
 
@@ -121,8 +117,6 @@ curl -i https://access-scan.com/api/health
 - `VPS_PORT`: SSHポート（通常 `22`）
 - `VPS_USER`: SSHユーザー（例: `admin`）
 - `VPS_DEPLOY_PATH`: 配備先（例: `/var/www/accessible-scan`）
-- `VPS_SYSTEMD_SERVICE`: systemd名（例: `accessible-scan`）
-- `APP_HEALTHCHECK_URL`: 例 `http://127.0.0.1:3000/api/health`
 
 ### GitHub Variables（推奨）
 
@@ -131,9 +125,6 @@ curl -i https://access-scan.com/api/health
 ### GitHub Secrets
 
 - `VPS_SSH_KEY`（必須）: 秘密鍵（OpenSSH形式、改行込み）
-- `PROD_ENV_FILE`（推奨）: 本番用 `.env` の全文（改行込み）
-
-`PROD_ENV_FILE` を設定すると、デプロイ時に `${VPS_DEPLOY_PATH}/.env` が更新されます。
 
 ### ドメイン取得後の反映（access-scan.com）
 
@@ -148,10 +139,6 @@ bash scripts/vps-switch-domain.sh
 
 - `VPS_USER` が `${VPS_DEPLOY_PATH}` に書き込み可能であること
 - GitHub ActionsからのSSHを許可すること
-- `sudo` パスワードなしで次が実行できること
-  - `systemctl restart <service>`
-  - `nginx -t`
-  - `systemctl reload nginx`
 
 ## 手動確認シナリオ
 
