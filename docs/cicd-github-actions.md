@@ -12,6 +12,7 @@ Variables（必須）:
 - `VPS_PORT` 例: `22`
 - `VPS_USER` 例: `admin`
 - `VPS_DEPLOY_PATH` 例: `/var/www/accessible-scan`
+- `NEXT_PUBLIC_GA_ID` 例: `G-SP9X1W0JH0`
 
 Variables（推奨）:
 
