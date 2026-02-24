@@ -48,16 +48,55 @@ async function runAxeViaScriptTag(page: Page): Promise<AxeRunResult> {
   }) as Promise<AxeRunResult>;
 }
 
+async function runAxeViaWrappedSource(page: Page): Promise<AxeRunResult> {
+  await resetAxeRuntime(page);
+
+  // Force CommonJS-style export path to avoid collisions with page-side globals.
+  const wrappedSource = `
+  ;(() => {
+    const module = { exports: {} };
+    const exports = module.exports;
+    ${axeCore.source}
+    if (!window.axe && module.exports && typeof module.exports.run === "function") {
+      window.axe = module.exports;
+    }
+  })();
+  `;
+
+  await page.addScriptTag({ content: wrappedSource });
+
+  return page.evaluate(async () => {
+    const w = window as unknown as Record<string, unknown> & {
+      axe?: {
+        run: (context?: Element | Document, options?: Record<string, unknown>) => Promise<unknown>;
+      };
+    };
+
+    if (!w.axe || typeof w.axe.run !== "function") {
+      throw new Error("axe runtime unavailable");
+    }
+
+    return w.axe.run(document);
+  }) as Promise<AxeRunResult>;
+}
+
 export async function runAxe(page: Page): Promise<AxeRunResult> {
   try {
-    return (await new AxeBuilder({ page }).analyze()) as AxeRunResult;
+    return (await new AxeBuilder({ page }).analyze()) as unknown as AxeRunResult;
   } catch (firstError) {
     try {
       return await runAxeViaScriptTag(page);
     } catch (secondError) {
-      const firstMessage = firstError instanceof Error ? firstError.message : String(firstError);
-      const secondMessage = secondError instanceof Error ? secondError.message : String(secondError);
-      throw new Error(`axe analyze failed (builder): ${firstMessage} | (scriptTag): ${secondMessage}`);
+      try {
+        return await runAxeViaWrappedSource(page);
+      } catch (thirdError) {
+        const firstMessage = firstError instanceof Error ? firstError.message : String(firstError);
+        const secondMessage = secondError instanceof Error ? secondError.message : String(secondError);
+        const thirdMessage = thirdError instanceof Error ? thirdError.message : String(thirdError);
+        throw new Error(
+          `axe analyze failed (builder): ${firstMessage} | (scriptTag): ${secondMessage} | (wrapped): ${thirdMessage}`
+        );
+      }
     }
   }
 }
