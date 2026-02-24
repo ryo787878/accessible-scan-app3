@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Shield, BarChart3, ListOrdered } from "lucide-react";
-import Image from "next/image";
 import { ScanForm } from "@/components/scan-form";
 import { JsonLd } from "@/components/seo/json-ld";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -120,7 +119,9 @@ export default function HomePage() {
       <JsonLd data={breadcrumbJsonLd} />
       <div className="flex w-full max-w-3xl flex-col gap-12">
         <section className="flex flex-col items-center gap-4 text-center">
-          <Image src="/apple-icon.png" alt="Accessible Scan ロゴ" width={80} height={80} priority />
+          <div className="bg-primary flex size-20 items-center justify-center rounded-3xl">
+            <Shield className="text-primary-foreground size-11" aria-hidden="true" />
+          </div>
           <div className="bg-primary/10 text-primary inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium">
             <Shield className="size-4" aria-hidden="true" />
             WCAG 2.1 準拠チェック

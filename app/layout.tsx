@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
-import { Analytics } from "@vercel/analytics/next";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { JsonLd } from "@/components/seo/json-ld";
@@ -57,19 +56,10 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
         url: "/icon.svg",
         type: "image/svg+xml",
       },
     ],
-    apple: "/apple-icon.png",
   },
 };
 
@@ -116,7 +106,6 @@ export default function RootLayout({
         {children}
         <SiteFooter />
         <Toaster position="top-right" richColors />
-        <Analytics />
       </body>
     </html>
   );
