@@ -1,0 +1,64 @@
+# Accessible Scan (Next.js) nginx server block example
+# - Add as a separate file from existing WordPress config.
+# - Designed for Cloudflare + VPS reverse proxy.
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name access-scan.com www.access-scan.com;
+
+    client_max_body_size 2m;
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        # For stricter websocket handling, you can use map-based Connection header switching.
+
+        proxy_read_timeout 120s;
+        proxy_send_timeout 120s;
+    }
+
+    # Optional: health endpoint logs can be reduced if needed.
+    # location = /api/health { access_log off; }
+}
+
+# HTTPS example (adjust certificate paths as needed)
+# server {
+#     listen 443 ssl http2;
+#     listen [::]:443 ssl http2;
+#     server_name access-scan.com www.access-scan.com;
+#
+#     ssl_certificate     /etc/letsencrypt/live/access-scan.com/fullchain.pem;
+#     ssl_certificate_key /etc/letsencrypt/live/access-scan.com/privkey.pem;
+#
+#     client_max_body_size 2m;
+#
+#     location / {
+#         proxy_pass http://127.0.0.1:3000;
+#         proxy_http_version 1.1;
+#         proxy_set_header Host $host;
+#         proxy_set_header X-Real-IP $remote_addr;
+#         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+#         proxy_set_header X-Forwarded-Proto $scheme;
+#         proxy_set_header Upgrade $http_upgrade;
+#         proxy_set_header Connection "upgrade";
+#         proxy_read_timeout 120s;
+#         proxy_send_timeout 120s;
+#     }
+# }
+#
+# HTTP -> HTTPS redirect example
+# server {
+#     listen 80;
+#     listen [::]:80;
+#     server_name access-scan.com www.access-scan.com;
+#     return 301 https://$host$request_uri;
+# }

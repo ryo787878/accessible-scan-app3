@@ -7,9 +7,7 @@ import { runAxe } from "@/lib/axe";
 import { logger } from "@/lib/logger";
 import { assertSafeHostname } from "@/lib/validation";
 import { ensureDbSchema } from "@/lib/db-init";
-
-const PAGE_TIMEOUT_MS = 30_000;
-const CONCURRENCY = 2;
+import { env } from "@/lib/env";
 
 type PageFailureCode =
   | "timeout"
@@ -43,14 +41,14 @@ async function processScanPage(scanPageId: number, pageUrl: string): Promise<voi
   const page = await context.newPage();
 
   try {
-    page.setDefaultNavigationTimeout(PAGE_TIMEOUT_MS);
-    page.setDefaultTimeout(PAGE_TIMEOUT_MS);
+    page.setDefaultNavigationTimeout(env.scanPageTimeoutMs);
+    page.setDefaultTimeout(env.scanPageTimeoutMs);
 
     const initialHost = new URL(pageUrl).hostname;
     await assertSafeHostname(initialHost);
 
     const response = await page.goto(pageUrl, {
-      timeout: PAGE_TIMEOUT_MS,
+      timeout: env.scanPageTimeoutMs,
       waitUntil: "domcontentloaded",
     });
 
@@ -152,7 +150,7 @@ export async function executeScan(publicId: string): Promise<void> {
       orderBy: { orderIndex: "asc" },
     });
 
-    const limit = pLimit(CONCURRENCY);
+    const limit = pLimit(env.scanConcurrency);
     await Promise.all(scanPages.map((page) => limit(() => processScanPage(page.id, page.url))));
 
     await db.scan.update({

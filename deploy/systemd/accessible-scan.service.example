@@ -1,0 +1,36 @@
+[Unit]
+Description=Accessible Scan Next.js App
+After=network.target
+
+[Service]
+Type=simple
+User=your-user
+Group=your-group
+WorkingDirectory=/var/www/accessible-scan
+
+# Option 1: read variables from file (recommended)
+# EnvironmentFile=/etc/sysconfig/accessible-scan
+# Option 2: use app-local .env loaded by shell wrapper (if needed)
+# EnvironmentFile=/var/www/accessible-scan/.env
+
+Environment=NODE_ENV=production
+Environment=PORT=3000
+
+# next start mode
+ExecStart=/usr/bin/env npm run start
+# standalone mode example:
+# ExecStart=/usr/bin/node /var/www/accessible-scan/.next/standalone/server.js
+
+Restart=always
+RestartSec=5
+TimeoutStopSec=30
+StandardOutput=journal
+StandardError=journal
+
+# Notes:
+# - Playwright requires OS-dependent shared libraries and Chromium install.
+# - Keep SQLite DB file outside deploy/public app directory
+#   (e.g., DATABASE_URL=file:/var/www/accessible-scan-data/app.db).
+
+[Install]
+WantedBy=multi-user.target

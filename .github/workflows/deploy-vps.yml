@@ -1,0 +1,107 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build app
+        run: npm run build
+
+      - name: Setup SSH key
+        run: |
+          install -m 700 -d ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+      - name: Configure known_hosts
+        env:
+          VPS_HOST: ${{ vars.VPS_HOST }}
+          VPS_PORT: ${{ vars.VPS_PORT }}
+          VPS_KNOWN_HOSTS: ${{ vars.VPS_KNOWN_HOSTS }}
+        run: |
+          if [ -n "${VPS_KNOWN_HOSTS}" ]; then
+            echo "${VPS_KNOWN_HOSTS}" >> ~/.ssh/known_hosts
+          else
+            ssh-keyscan -p "${VPS_PORT:-22}" -H "${VPS_HOST}" >> ~/.ssh/known_hosts
+          fi
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Sync files to VPS
+        env:
+          VPS_HOST: ${{ vars.VPS_HOST }}
+          VPS_PORT: ${{ vars.VPS_PORT }}
+          VPS_USER: ${{ vars.VPS_USER }}
+          VPS_DEPLOY_PATH: ${{ vars.VPS_DEPLOY_PATH }}
+        run: |
+          rsync -az --delete \
+            --exclude '.git' \
+            --exclude '.github' \
+            --exclude 'node_modules' \
+            --exclude '.next' \
+            --exclude '*.log' \
+            --exclude '.env' \
+            -e "ssh -p ${VPS_PORT:-22} -i ~/.ssh/id_ed25519" \
+            ./ "${VPS_USER}@${VPS_HOST}:${VPS_DEPLOY_PATH}/"
+
+      - name: Deploy on VPS
+        env:
+          VPS_HOST: ${{ vars.VPS_HOST }}
+          VPS_PORT: ${{ vars.VPS_PORT }}
+          VPS_USER: ${{ vars.VPS_USER }}
+          VPS_DEPLOY_PATH: ${{ vars.VPS_DEPLOY_PATH }}
+          VPS_SYSTEMD_SERVICE: ${{ vars.VPS_SYSTEMD_SERVICE }}
+          APP_HEALTHCHECK_URL: ${{ vars.APP_HEALTHCHECK_URL }}
+          PROD_ENV_FILE: ${{ secrets.PROD_ENV_FILE }}
+        run: |
+          if [ -n "${PROD_ENV_FILE:-}" ]; then
+            ssh -p "${VPS_PORT:-22}" -i ~/.ssh/id_ed25519 "${VPS_USER}@${VPS_HOST}" "umask 077 && cat > '${VPS_DEPLOY_PATH}/.env'" <<EOF
+${PROD_ENV_FILE}
+EOF
+          fi
+
+          ssh -p "${VPS_PORT:-22}" -i ~/.ssh/id_ed25519 "${VPS_USER}@${VPS_HOST}" \
+            "VPS_DEPLOY_PATH='${VPS_DEPLOY_PATH}' VPS_SYSTEMD_SERVICE='${VPS_SYSTEMD_SERVICE}' APP_HEALTHCHECK_URL='${APP_HEALTHCHECK_URL}' bash -s" <<'EOSSH'
+          set -euo pipefail
+
+          cd "${VPS_DEPLOY_PATH}"
+
+          npm ci
+          npx prisma generate
+          npm run build
+
+          sudo -n systemctl restart "${VPS_SYSTEMD_SERVICE:-accessible-scan}"
+          sudo -n nginx -t
+          sudo -n systemctl reload nginx
+
+          if [ -n "${APP_HEALTHCHECK_URL:-}" ]; then
+            curl -fsS "${APP_HEALTHCHECK_URL}"
+          else
+            curl -fsS http://127.0.0.1:3000/api/health
+          fi
+          EOSSH

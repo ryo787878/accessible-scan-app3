@@ -67,6 +67,91 @@ npm run build
 - `POST /api/scans`
 - `GET /api/scans/[publicId]`
 - `GET /api/scans/[publicId]/report`
+- `GET /api/health`
+
+## 本番公開（VPS自己ホスト）
+
+本アプリはVPS上での自己ホスト運用を前提としています。  
+詳細手順は [`docs/deploy-vps.md`](docs/deploy-vps.md) を参照してください。
+
+概要:
+
+- Cloudflare DNSで新規ドメインをVPSへ向ける
+- nginxの別server blockでWordPressとドメイン単位で共存
+- nginx reverse proxyで `127.0.0.1:3000` のNext.jsへ転送
+- systemdで `next start` を常駐
+
+### `.env` とSQLiteの扱い
+
+- `.env` は本番配布物に含めない（Gitにコミットしない）
+- `.env.example` を雛形に本番用 `.env` を手動作成
+- SQLite DBファイルは公開ディレクトリ外に配置
+  - 例: `DATABASE_URL=file:/var/www/accessible-scan-data/app.db`
+
+### Playwright本番運用の注意
+
+- Playwright実行にはOS依存ライブラリが必要
+- VPSメモリやCPUに応じて `SCAN_CONCURRENCY` / `SCAN_PAGE_TIMEOUT_MS` を調整
+
+### ヘルスチェック
+
+```bash
+curl -i https://access-scan.com/api/health
+```
+
+`status: "ok"` が返れば、Cloudflare/nginx/アプリ疎通確認に利用できます。
+
+## CI/CD（main push -> VPS反映）
+
+`.github/workflows/deploy-vps.yml` を追加しています。  
+`main` ブランチにpushすると、GitHub Actionsが以下を実行します。
+
+- `npm ci` / `npm test` / `npm run build`（GitHub Actions上）
+- VPSへ `rsync` 配備
+- VPSで `npm ci` / `npx prisma generate` / `npm run build`
+- `systemctl restart accessible-scan`
+- `nginx -t` と `nginx reload`
+- `GET /api/health` で最終確認
+
+詳細手順: [`docs/cicd-github-actions.md`](docs/cicd-github-actions.md)
+
+### GitHub Variables（必須）
+
+- `VPS_HOST`: VPSホスト名またはIP
+- `VPS_PORT`: SSHポート（通常 `22`）
+- `VPS_USER`: SSHユーザー（例: `admin`）
+- `VPS_DEPLOY_PATH`: 配備先（例: `/var/www/accessible-scan`）
+- `VPS_SYSTEMD_SERVICE`: systemd名（例: `accessible-scan`）
+- `APP_HEALTHCHECK_URL`: 例 `http://127.0.0.1:3000/api/health`
+
+### GitHub Variables（推奨）
+
+- `VPS_KNOWN_HOSTS`: `ssh-keyscan -H <host>` の結果
+
+### GitHub Secrets
+
+- `VPS_SSH_KEY`（必須）: 秘密鍵（OpenSSH形式、改行込み）
+- `PROD_ENV_FILE`（推奨）: 本番用 `.env` の全文（改行込み）
+
+`PROD_ENV_FILE` を設定すると、デプロイ時に `${VPS_DEPLOY_PATH}/.env` が更新されます。
+
+### ドメイン取得後の反映（access-scan.com）
+
+VPSで以下を実行すると、`.env` と nginx `server_name` をまとめて `access-scan.com` に切り替えます。
+
+```bash
+cd /var/www/accessible-scan
+bash scripts/vps-switch-domain.sh
+```
+
+### VPS側の事前設定
+
+- `VPS_USER` が `${VPS_DEPLOY_PATH}` に書き込み可能であること
+- GitHub ActionsからのSSHを許可すること
+- `sudo` パスワードなしで次が実行できること
+  - `systemctl restart <service>`
+  - `nginx -t`
+  - `systemctl reload nginx`
 
 ## 手動確認シナリオ
 

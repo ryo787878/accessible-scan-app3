@@ -1,6 +1,7 @@
 import dns from "node:dns/promises";
 import net from "node:net";
 import { scanRequestSchema } from "@/lib/schemas";
+import { env } from "@/lib/env";
 import { ensureUrlWithScheme, normalizeUrl } from "@/lib/url";
 
 const MAX_URL_LENGTH = 2048;
@@ -89,7 +90,7 @@ export async function validateInput(input: unknown): Promise<{ inputUrl: string;
   return {
     inputUrl: rawUrl,
     normalizedRootUrl: normalizeUrl(rawUrl),
-    maxPages: Math.min(20, Math.max(1, parsed.data.maxPages ?? 10)),
+    maxPages: Math.min(env.scanMaxPagesLimit, Math.max(1, parsed.data.maxPages ?? env.scanMaxPagesDefault)),
   };
 }
 
