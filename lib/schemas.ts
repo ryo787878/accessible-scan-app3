@@ -9,6 +9,12 @@ export const scanRequestSchema = z.object({
     .min(1, "1ページ以上を指定してください")
     .max(env.scanMaxPagesLimit, `最大${env.scanMaxPagesLimit}ページまで指定できます`)
     .optional(),
+  hasAuthorization: z.literal(true, {
+    errorMap: () => ({ message: "対象サイトの管理権限を持っていることを確認してください" }),
+  }),
+  acceptedTerms: z.literal(true, {
+    errorMap: () => ({ message: "利用規約・プライバシーポリシーへの同意が必要です" }),
+  }),
 });
 
 export type ScanRequest = z.infer<typeof scanRequestSchema>;

@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Search, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
@@ -22,10 +24,14 @@ export function ScanForm() {
   const [maxPages, setMaxPages] = useState(10);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [urlError, setUrlError] = useState<string | null>(null);
+  const [agreementError, setAgreementError] = useState<string | null>(null);
+  const [hasAuthorization, setHasAuthorization] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setUrlError(null);
+    setAgreementError(null);
 
     // クライアントサイドバリデーション
     const trimmedUrl = url.trim();
@@ -49,13 +55,18 @@ export function ScanForm() {
       return;
     }
 
+    if (!hasAuthorization || !acceptedTerms) {
+      setAgreementError("権限確認と規約同意の両方が必要です");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       const res = await fetch("/api/scans", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: trimmedUrl, maxPages }),
+        body: JSON.stringify({ url: trimmedUrl, maxPages, hasAuthorization, acceptedTerms }),
       });
 
       if (!res.ok) {
@@ -148,10 +159,62 @@ export function ScanForm() {
             </div>
           </div>
 
+          <div className="space-y-3">
+            <div className="flex items-start gap-3">
+              <Checkbox
+                id="has-authorization"
+                checked={hasAuthorization}
+                onCheckedChange={(checked) => {
+                  setHasAuthorization(checked === true);
+                  if (agreementError) setAgreementError(null);
+                }}
+                disabled={isSubmitting}
+                aria-describedby="authorization-help"
+              />
+              <div className="space-y-1">
+                <Label htmlFor="has-authorization" className="cursor-pointer leading-relaxed">
+                  対象サイトの管理者、または診断権限を持つ担当者であることを確認しました
+                </Label>
+                <p id="authorization-help" className="text-muted-foreground text-xs">
+                  第三者サイトの無断診断や、ログイン突破などの回避行為は禁止です。
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <Checkbox
+                id="accept-terms"
+                checked={acceptedTerms}
+                onCheckedChange={(checked) => {
+                  setAcceptedTerms(checked === true);
+                  if (agreementError) setAgreementError(null);
+                }}
+                disabled={isSubmitting}
+                aria-describedby="terms-help"
+              />
+              <Label htmlFor="accept-terms" id="terms-help" className="cursor-pointer leading-relaxed">
+                <Link href="/terms" className="text-primary hover:underline">
+                  利用規約
+                </Link>
+                と
+                <Link href="/privacy" className="text-primary hover:underline">
+                  プライバシーポリシー
+                </Link>
+                に同意します
+              </Label>
+            </div>
+
+            {agreementError && (
+              <p className="text-destructive text-sm" role="alert">
+                {agreementError}
+              </p>
+            )}
+          </div>
+
           <Button
             type="submit"
             size="lg"
-            disabled={isSubmitting}
+            disabled={isSubmitting || !hasAuthorization || !acceptedTerms}
             className="w-full text-base"
           >
             {isSubmitting ? (

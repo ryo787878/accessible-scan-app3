@@ -69,6 +69,29 @@ npm run build
 - `GET /api/scans/[publicId]/report`
 - `GET /api/health`
 
+`POST /api/scans` の必須入力:
+
+- `url` (string)
+- `maxPages` (number, optional)
+- `hasAuthorization` (boolean, `true` 必須)
+- `acceptedTerms` (boolean, `true` 必須)
+
+## 利用規約・プライバシー
+
+- 利用規約: `/terms`
+- プライバシーポリシー: `/privacy`
+
+公開運用では、診断前に以下を必須化しています。
+
+- 対象サイトの権限確認（管理権限または明示的な診断許諾）
+- 利用規約・プライバシーポリシーへの同意
+
+加えて、技術的制限として以下を実装しています。
+
+- `robots.txt` の `Disallow` を尊重したクロール制御
+- `POST /api/scans` のレート制限
+- SSRF対策（プライベートIP/localhostへのアクセス拒否、リダイレクト先再検証）
+
 ## 本番公開（VPS自己ホスト）
 
 本アプリはVPS上での自己ホスト運用を前提としています。  

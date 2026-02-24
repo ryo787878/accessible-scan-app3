@@ -12,6 +12,14 @@ export function SiteFooter() {
             トップ
           </Link>
           <span aria-hidden="true">|</span>
+          <Link href="/terms" className="hover:text-foreground transition-colors">
+            利用規約
+          </Link>
+          <span aria-hidden="true">|</span>
+          <Link href="/privacy" className="hover:text-foreground transition-colors">
+            プライバシー
+          </Link>
+          <span aria-hidden="true">|</span>
           <span>自動診断のみ</span>
         </div>
       </div>

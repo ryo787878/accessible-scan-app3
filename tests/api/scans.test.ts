@@ -66,7 +66,12 @@ describe("scan api routes", () => {
         "content-type": "application/json",
         "x-forwarded-for": "203.0.113.10",
       },
-      body: JSON.stringify({ url: "https://example.com", maxPages: 10 }),
+      body: JSON.stringify({
+        url: "https://example.com",
+        maxPages: 10,
+        hasAuthorization: true,
+        acceptedTerms: true,
+      }),
     });
 
     const res = await POST(req);
@@ -87,7 +92,12 @@ describe("scan api routes", () => {
         "content-type": "application/json",
         "x-forwarded-for": "203.0.113.11",
       },
-      body: JSON.stringify({ url: "bad-url", maxPages: 10 }),
+      body: JSON.stringify({
+        url: "bad-url",
+        maxPages: 10,
+        hasAuthorization: true,
+        acceptedTerms: true,
+      }),
     });
 
     const res = await POST(req);

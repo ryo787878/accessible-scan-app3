@@ -9,14 +9,24 @@ describe("validation", () => {
   });
 
   it("accepts valid public input", async () => {
-    const result = await validateInput({ url: "https://example.com", maxPages: 10 });
+    const result = await validateInput({
+      url: "https://example.com",
+      maxPages: 10,
+      hasAuthorization: true,
+      acceptedTerms: true,
+    });
     expect(result.normalizedRootUrl).toBe("https://example.com/");
     expect(result.maxPages).toBe(10);
   });
 
   it("rejects unsupported scheme", async () => {
-    await expect(validateInput({ url: "javascript:alert(1)", maxPages: 10 })).rejects.toThrow(
-      "http:// または https:// のURLを指定してください"
-    );
+    await expect(
+      validateInput({
+        url: "javascript:alert(1)",
+        maxPages: 10,
+        hasAuthorization: true,
+        acceptedTerms: true,
+      })
+    ).rejects.toThrow("http:// または https:// のURLを指定してください");
   });
 });

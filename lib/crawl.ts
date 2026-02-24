@@ -2,6 +2,7 @@ import { XMLParser } from "fast-xml-parser";
 import * as cheerio from "cheerio";
 import { normalizeAndFilterUrl, normalizeUrl } from "@/lib/url";
 import { safeFetchWithRedirectValidation } from "@/lib/validation";
+import { getRobotsDisallowRules, isRobotsAllowed } from "@/lib/robots-policy";
 import { logger } from "@/lib/logger";
 
 const FETCH_TIMEOUT_MS = 15_000;
@@ -29,7 +30,7 @@ function extractSitemapUrls(xml: string): string[] {
   return [];
 }
 
-async function tryCollectFromSitemap(rootUrl: string, maxCandidates: number): Promise<string[]> {
+async function tryCollectFromSitemap(rootUrl: string, maxCandidates: number, disallowRules: string[]): Promise<string[]> {
   const root = new URL(rootUrl);
   const sitemapUrl = `${root.origin}/sitemap.xml`;
 
@@ -44,6 +45,7 @@ async function tryCollectFromSitemap(rootUrl: string, maxCandidates: number): Pr
     for (const raw of candidateRaw) {
       const normalized = normalizeAndFilterUrl(rootUrl, raw);
       if (!normalized) continue;
+      if (!isRobotsAllowed(normalized, disallowRules)) continue;
       collected.push(normalized);
       if (collected.length >= maxCandidates) break;
     }
@@ -69,11 +71,14 @@ async function fetchHtml(url: string): Promise<string | null> {
   }
 }
 
-async function fallbackCrawl(rootUrl: string, maxCandidates: number): Promise<string[]> {
+async function fallbackCrawl(rootUrl: string, maxCandidates: number, disallowRules: string[]): Promise<string[]> {
   const normalizedRoot = normalizeUrl(rootUrl);
-  const queue: Array<{ url: string; depth: number }> = [{ url: normalizedRoot, depth: 0 }];
+  const isRootAllowed = isRobotsAllowed(normalizedRoot, disallowRules);
+  const queue: Array<{ url: string; depth: number }> = isRootAllowed
+    ? [{ url: normalizedRoot, depth: 0 }]
+    : [];
   const visited = new Set<string>();
-  const found = new Set<string>([normalizedRoot]);
+  const found = new Set<string>(isRootAllowed ? [normalizedRoot] : []);
 
   while (queue.length > 0 && found.size < maxCandidates) {
     const current = queue.shift();
@@ -93,6 +98,7 @@ async function fallbackCrawl(rootUrl: string, maxCandidates: number): Promise<st
     for (const link of links) {
       const normalized = normalizeAndFilterUrl(normalizedRoot, link);
       if (!normalized || found.has(normalized)) continue;
+      if (!isRobotsAllowed(normalized, disallowRules)) continue;
 
       found.add(normalized);
       if (found.size >= maxCandidates) break;
@@ -108,11 +114,14 @@ async function fallbackCrawl(rootUrl: string, maxCandidates: number): Promise<st
 
 export async function collectCandidateUrls(rootUrl: string, maxPages: number): Promise<string[]> {
   const maxCandidates = Math.max(maxPages * 4, maxPages);
-  const fromSitemap = await tryCollectFromSitemap(rootUrl, maxCandidates);
+  const normalizedRoot = normalizeUrl(rootUrl);
+  const disallowRules = await getRobotsDisallowRules(normalizedRoot);
+  const fromSitemap = await tryCollectFromSitemap(normalizedRoot, maxCandidates, disallowRules);
+  const rootAllowed = isRobotsAllowed(normalizedRoot, disallowRules);
 
   if (fromSitemap.length > 0) {
-    return Array.from(new Set([normalizeUrl(rootUrl), ...fromSitemap]));
+    return Array.from(new Set(rootAllowed ? [normalizedRoot, ...fromSitemap] : fromSitemap));
   }
 
-  return fallbackCrawl(rootUrl, maxCandidates);
+  return fallbackCrawl(normalizedRoot, maxCandidates, disallowRules);
 }
