@@ -42,11 +42,10 @@ jobs:
           VPS_PORT: ${{ vars.VPS_PORT }}
           VPS_USER: ${{ vars.VPS_USER }}
           VPS_DEPLOY_PATH: ${{ vars.VPS_DEPLOY_PATH }}
-          NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID }}
           VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
         run: |
           set -euo pipefail
-          required_vars=(VPS_HOST VPS_USER VPS_DEPLOY_PATH NEXT_PUBLIC_GA_ID)
+          required_vars=(VPS_HOST VPS_USER VPS_DEPLOY_PATH)
           for name in "${required_vars[@]}"; do
             if [ -z "${!name:-}" ]; then
               echo "Missing required GitHub Variable: $name"
@@ -105,17 +104,11 @@ jobs:
           VPS_PORT: ${{ vars.VPS_PORT }}
           VPS_USER: ${{ vars.VPS_USER }}
           VPS_DEPLOY_PATH: ${{ vars.VPS_DEPLOY_PATH }}
-          NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID }}
         run: |
           ssh -p "${VPS_PORT:-22}" -i ~/.ssh/id_ed25519 "${VPS_USER}@${VPS_HOST}" \
-            "VPS_DEPLOY_PATH='${VPS_DEPLOY_PATH}' NEXT_PUBLIC_GA_ID='${NEXT_PUBLIC_GA_ID}' bash -s" <<'EOSSH'
+            "VPS_DEPLOY_PATH='${VPS_DEPLOY_PATH}' bash -s" <<'EOSSH'
           set -euo pipefail
           cd "${VPS_DEPLOY_PATH}"
-          if grep -q '^NEXT_PUBLIC_GA_ID=' .env 2>/dev/null; then
-            sed -i "s|^NEXT_PUBLIC_GA_ID=.*|NEXT_PUBLIC_GA_ID=${NEXT_PUBLIC_GA_ID}|" .env
-          else
-            printf '\nNEXT_PUBLIC_GA_ID=%s\n' "${NEXT_PUBLIC_GA_ID}" >> .env
-          fi
           npm ci
           npx prisma generate
           npx playwright install chromium

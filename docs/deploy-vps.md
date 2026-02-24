@@ -48,7 +48,6 @@ npx playwright install chromium
 NODE_ENV=production
 PORT=3000
 APP_BASE_URL=https://access-scan.com
-NEXT_PUBLIC_GA_ID=G-SP9X1W0JH0
 DATABASE_URL=file:/srv/accessible-scan-data/app.db
 ```
 
