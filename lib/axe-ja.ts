@@ -23,6 +23,11 @@ const axeRuleJa: Record<string, string> = {
   "nested-interactive": "インタラクティブ要素が入れ子になっている",
   "object-alt": "object要素に代替テキストがない",
   "aria-allowed-role": "許可されていないARIAロールが指定されている",
+  "aria-required-children": "必要な子要素が不足しているARIAロールがある",
+  "link-in-text-block": "本文中リンクの識別性が不足している",
+  "aria-hidden-focus": "フォーカス可能要素がaria-hidden配下にある",
+  "image-redundant-alt": "画像の代替テキストが冗長になっている",
+  "empty-heading": "空の見出し要素がある",
   region: "コンテンツがランドマーク領域に含まれていない",
   tabindex: "tabindex が0より大きい値になっている",
 };
@@ -40,6 +45,16 @@ const axeQuickFixJa: Record<string, string> = {
   "landmark-unique": "同じ役割のランドマークには一意なラベルを付けて区別してください。",
   "landmark-no-duplicate-contentinfo": "contentinfoランドマークは原則1つに整理してください。",
   region: "主要コンテンツをmain/nav/header/footerなどのランドマーク内に配置してください。",
+  "aria-required-children":
+    "roleに応じて必須の子要素（例: list内のlistitem）を追加し、ARIA構造を正しくしてください。",
+  "link-in-text-block":
+    "本文リンクは色だけに頼らず、下線などで通常テキストと判別できるようにしてください。",
+  "aria-hidden-focus":
+    "aria-hidden配下にフォーカス可能要素を置かないか、フォーカス不可にして読み上げ/操作の不整合を解消してください。",
+  "image-redundant-alt":
+    "alt内の『画像』『写真』など冗長語を削除し、内容だけを簡潔に説明してください。",
+  "empty-heading":
+    "空の見出しを削除するか、セクション内容を示す見出しテキストを設定してください。",
 };
 
 /** ルールIDの日本語名を取得（未登録の場合はIDをそのまま返す） */
