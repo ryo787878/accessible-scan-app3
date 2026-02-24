@@ -1,5 +1,5 @@
 import pLimit from "p-limit";
-import { chromium } from "playwright";
+import { chromium, type BrowserContext, type Page } from "playwright";
 import { db } from "@/lib/db";
 import { collectCandidateUrls } from "@/lib/crawl";
 import { prioritizeUrls } from "@/lib/prioritize";
@@ -114,6 +114,21 @@ async function skipPage(scanPageId: number, code: PageFailureCode, message: stri
   });
 }
 
+async function runAxeOnDomSnapshot(
+  context: BrowserContext,
+  sourcePage: Page,
+  sourceUrl: string
+): Promise<Awaited<ReturnType<typeof runAxe>>> {
+  const snapshotPage = await context.newPage();
+  try {
+    const html = await sourcePage.content();
+    await snapshotPage.setContent(html, { waitUntil: "domcontentloaded" });
+    return await runAxe(snapshotPage, `${sourceUrl}#dom-snapshot`);
+  } finally {
+    await snapshotPage.close();
+  }
+}
+
 async function processScanPage(scanPageId: number, pageUrl: string): Promise<void> {
   await db.scanPage.update({
     where: { id: scanPageId },
@@ -198,18 +213,27 @@ async function processScanPage(scanPageId: number, pageUrl: string): Promise<voi
         await page.waitForTimeout(500);
         axe = await runAxe(page, pageUrl);
       } catch (retryError) {
-        await skipPage(
-          scanPageId,
-          "axe_unavailable",
-          `axe実行失敗（このページはスキップ）: ${String(retryError)}`,
-          status ?? undefined
-        );
-        logger.warn("page skipped due to axe unavailable", {
+        logger.warn("axe run failed on live page; trying dom snapshot fallback", {
           scanPageId,
           pageUrl,
           error: retryError instanceof Error ? retryError.message : String(retryError),
         });
-        return;
+        try {
+          axe = await runAxeOnDomSnapshot(context, page, pageUrl);
+        } catch (snapshotError) {
+          await skipPage(
+            scanPageId,
+            "axe_unavailable",
+            `axe実行失敗（このページはスキップ）: ${String(snapshotError)}`,
+            status ?? undefined
+          );
+          logger.warn("page skipped due to axe unavailable", {
+            scanPageId,
+            pageUrl,
+            error: snapshotError instanceof Error ? snapshotError.message : String(snapshotError),
+          });
+          return;
+        }
       }
     }
 

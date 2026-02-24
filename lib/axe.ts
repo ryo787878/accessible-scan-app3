@@ -1,5 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import axeCore from "axe-core";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import type { Page } from "playwright";
 import { logger } from "@/lib/logger";
 
@@ -24,6 +26,23 @@ type AxeRuntimeState = {
   readyState: string;
   cspMeta: string | null;
 };
+
+let cachedAxeSource: string | null = null;
+
+function getAxeSource(): string {
+  if (cachedAxeSource) return cachedAxeSource;
+
+  // Prefer minified source to reduce payload size when injecting into remote pages.
+  // Some environments are unstable with large inline script payloads.
+  try {
+    const minPath = join(process.cwd(), "node_modules", "axe-core", "axe.min.js");
+    cachedAxeSource = readFileSync(minPath, "utf8");
+    if (cachedAxeSource.length > 0) return cachedAxeSource;
+  } catch {}
+
+  cachedAxeSource = axeCore.source;
+  return cachedAxeSource;
+}
 
 async function getAxeRuntimeState(page: Page): Promise<AxeRuntimeState> {
   return page.evaluate(() => {
@@ -58,7 +77,7 @@ async function resetAxeRuntime(page: Page): Promise<void> {
 
 async function runAxeViaScriptTag(page: Page): Promise<AxeRunResult> {
   await resetAxeRuntime(page);
-  await page.addScriptTag({ content: axeCore.source });
+  await page.addScriptTag({ content: getAxeSource() });
 
   return page.evaluate(async () => {
     const w = window as unknown as Record<string, unknown> & {
@@ -83,7 +102,7 @@ async function runAxeViaWrappedSource(page: Page): Promise<AxeRunResult> {
   ;(() => {
     const module = { exports: {} };
     const exports = module.exports;
-    ${axeCore.source}
+    ${getAxeSource()}
     if (!window.axe && module.exports && typeof module.exports.run === "function") {
       window.axe = module.exports;
     }
@@ -109,38 +128,38 @@ async function runAxeViaWrappedSource(page: Page): Promise<AxeRunResult> {
 
 export async function runAxe(page: Page, pageUrl?: string): Promise<AxeRunResult> {
   try {
-    return (await new AxeBuilder({ page }).analyze()) as unknown as AxeRunResult;
-  } catch (firstError) {
-    logger.warn("axe builder failed", {
+    return await runAxeViaScriptTag(page);
+  } catch (scriptTagError) {
+    const stateAfterScriptTag = await getAxeRuntimeState(page).catch(() => null);
+    logger.warn("axe scriptTag failed", {
       pageUrl: pageUrl ?? page.url(),
-      error: firstError instanceof Error ? firstError.message : String(firstError),
+      error: scriptTagError instanceof Error ? scriptTagError.message : String(scriptTagError),
+      runtimeState: stateAfterScriptTag,
     });
 
     try {
-      return await runAxeViaScriptTag(page);
-    } catch (secondError) {
-      const stateAfterScriptTag = await getAxeRuntimeState(page).catch(() => null);
-      logger.warn("axe scriptTag fallback failed", {
+      return await runAxeViaWrappedSource(page);
+    } catch (wrappedError) {
+      const stateAfterWrapped = await getAxeRuntimeState(page).catch(() => null);
+      logger.warn("axe wrappedSource failed", {
         pageUrl: pageUrl ?? page.url(),
-        error: secondError instanceof Error ? secondError.message : String(secondError),
-        runtimeState: stateAfterScriptTag,
+        error: wrappedError instanceof Error ? wrappedError.message : String(wrappedError),
+        runtimeState: stateAfterWrapped,
       });
 
       try {
-        return await runAxeViaWrappedSource(page);
-      } catch (thirdError) {
-        const stateAfterWrapped = await getAxeRuntimeState(page).catch(() => null);
-        logger.warn("axe wrappedSource fallback failed", {
+        return (await new AxeBuilder({ page }).analyze()) as unknown as AxeRunResult;
+      } catch (builderError) {
+        logger.warn("axe builder fallback failed", {
           pageUrl: pageUrl ?? page.url(),
-          error: thirdError instanceof Error ? thirdError.message : String(thirdError),
-          runtimeState: stateAfterWrapped,
+          error: builderError instanceof Error ? builderError.message : String(builderError),
         });
 
-        const firstMessage = firstError instanceof Error ? firstError.message : String(firstError);
-        const secondMessage = secondError instanceof Error ? secondError.message : String(secondError);
-        const thirdMessage = thirdError instanceof Error ? thirdError.message : String(thirdError);
+        const firstMessage = scriptTagError instanceof Error ? scriptTagError.message : String(scriptTagError);
+        const secondMessage = wrappedError instanceof Error ? wrappedError.message : String(wrappedError);
+        const thirdMessage = builderError instanceof Error ? builderError.message : String(builderError);
         throw new Error(
-          `axe analyze failed (builder): ${firstMessage} | (scriptTag): ${secondMessage} | (wrapped): ${thirdMessage}`
+          `axe analyze failed (scriptTag): ${firstMessage} | (wrapped): ${secondMessage} | (builder): ${thirdMessage}`
         );
       }
     }
