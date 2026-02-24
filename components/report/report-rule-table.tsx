@@ -73,26 +73,7 @@ export function ReportRuleTable({ scan }: ReportRuleTableProps) {
                       </TableHeader>
                       <TableBody>
                         {filtered.map((rule) => (
-                          <TableRow
-                            key={rule.ruleId}
-                            className="cursor-pointer"
-                            role="button"
-                            tabIndex={0}
-                            onClick={() => {
-                              const target = document.getElementById(`rule-${rule.ruleId}`);
-                              if (target) {
-                                target.scrollIntoView({ behavior: "smooth", block: "start" });
-                              }
-                            }}
-                            onKeyDown={(e) => {
-                              if (e.key !== "Enter" && e.key !== " ") return;
-                              e.preventDefault();
-                              const target = document.getElementById(`rule-${rule.ruleId}`);
-                              if (target) {
-                                target.scrollIntoView({ behavior: "smooth", block: "start" });
-                              }
-                            }}
-                          >
+                          <TableRow key={rule.ruleId}>
                             <TableCell className="min-w-0 px-3 py-4 align-top whitespace-normal md:px-4">
                               <div className="flex flex-col gap-1.5">
                                 {(() => {
