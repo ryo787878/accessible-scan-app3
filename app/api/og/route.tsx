@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
+export const revalidate = 86_400;
 
 const themes = {
   lp: { label: "LP", color: "#0f172a", accent: "#22c55e" },
@@ -52,6 +53,10 @@ export async function GET(request: Request) {
     {
       width: 1200,
       height: 630,
+      headers: {
+        "Cache-Control": "public, max-age=0, s-maxage=86400, stale-while-revalidate=604800",
+        "CDN-Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800",
+      },
     }
   );
 }

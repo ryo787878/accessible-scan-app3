@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { canonicalPathname } from "@/lib/seo/routes";
 
 function withSecurityHeaders(response: NextResponse): NextResponse {
   response.headers.set("X-Content-Type-Options", "nosniff");
@@ -13,16 +14,11 @@ function withSecurityHeaders(response: NextResponse): NextResponse {
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const normalized = canonicalPathname(pathname);
 
-  if (
-    pathname !== "/" &&
-    pathname.endsWith("/") &&
-    !pathname.startsWith("/_next") &&
-    !pathname.startsWith("/api") &&
-    !pathname.includes(".")
-  ) {
+  if (!pathname.startsWith("/_next") && !pathname.startsWith("/api") && !pathname.includes(".") && normalized !== pathname) {
     const url = request.nextUrl.clone();
-    url.pathname = pathname.replace(/\/+$/, "");
+    url.pathname = normalized;
     return withSecurityHeaders(NextResponse.redirect(url, 308));
   }
 
