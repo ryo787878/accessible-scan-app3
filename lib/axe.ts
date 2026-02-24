@@ -71,6 +71,43 @@ async function runAxeFallback(page: Page) {
   }>;
 }
 
+async function runAxeViaScriptTag(page: Page) {
+  await page.addScriptTag({ content: axeCore.source });
+  return page.evaluate(async () => {
+    const w = window as unknown as Record<string, unknown> & {
+      axe?: {
+        run: (
+          context?: Element | Document,
+          options?: Record<string, unknown>
+        ) => Promise<unknown>;
+      };
+      module?: { exports?: unknown } | unknown;
+    };
+
+    const axeRuntime =
+      w.axe ??
+      (typeof w.module === "object" && w.module !== null && "exports" in w.module
+        ? ((w.module as { exports?: unknown }).exports as typeof w.axe)
+        : undefined);
+
+    if (!axeRuntime || typeof axeRuntime.run !== "function") {
+      throw new Error("axe runtime unavailable");
+    }
+
+    return axeRuntime.run(document);
+  }) as Promise<{
+    violations: Array<{
+      id: string;
+      impact?: string | null;
+      description: string;
+      help: string;
+      helpUrl: string;
+      tags?: string[];
+      nodes: Array<Record<string, unknown>>;
+    }>;
+  }>;
+}
+
 export async function runAxe(page: Page) {
   await prepareAxeGlobals(page);
 
@@ -80,11 +117,10 @@ export async function runAxe(page: Page) {
       axeSource: axeCore.source,
     }).analyze();
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    if (!message.includes("module is not defined")) {
-      throw error;
+    try {
+      return await runAxeViaScriptTag(page);
+    } catch {
+      return runAxeFallback(page);
     }
-
-    return runAxeFallback(page);
   }
 }
