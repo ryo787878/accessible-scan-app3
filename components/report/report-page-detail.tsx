@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getAxeRuleJa, getQuickFixJa } from "@/lib/axe-ja";
 import { SeverityBadge } from "@/components/report/severity-badge";
 import {
@@ -34,9 +34,11 @@ function scrollToElementWithOffset(elementId: string) {
 }
 
 export function ReportPageDetail({ scan, focusRuleId }: ReportPageDetailProps) {
+  const sectionRef = useRef<HTMLElement | null>(null);
   const successPages = scan.pages.filter((p) => p.status === "success");
   const failedPages = scan.pages.filter((p) => p.status === "failed");
   const [openItems, setOpenItems] = useState<string[]>([]);
+  const [showFloatingBack, setShowFloatingBack] = useState(false);
   const firstRuleAnchorByPage = new Map<string, Set<string>>();
 
   {
@@ -76,8 +78,26 @@ export function ReportPageDetail({ scan, focusRuleId }: ReportPageDetailProps) {
     }, 120);
   }, [focusRuleId, firstPageByRule]);
 
+  useEffect(() => {
+    const onScroll = () => {
+      const section = sectionRef.current;
+      if (!section) return;
+      const rect = section.getBoundingClientRect();
+      const inView = rect.top < window.innerHeight * 0.7 && rect.bottom > window.innerHeight * 0.3;
+      setShowFloatingBack(inView);
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+
   return (
-    <section aria-label="ページ別詳細">
+    <section ref={sectionRef} aria-label="ページ別詳細">
       <div className="flex flex-col gap-4">
         <h2 className="text-xl font-bold tracking-tight">ページ別詳細</h2>
         {failedPages.length > 0 && (
@@ -199,6 +219,19 @@ export function ReportPageDetail({ scan, focusRuleId }: ReportPageDetailProps) {
           </Button>
         </div>
       </div>
+      {showFloatingBack && (
+        <div className="fixed inset-x-0 bottom-5 z-40 flex justify-center px-4">
+          <Button
+            type="button"
+            variant="outline"
+            className="bg-background/95 shadow-lg backdrop-blur"
+            onClick={() => scrollToElementWithOffset("rule-aggregate")}
+          >
+            <ChevronUp aria-hidden="true" />
+            ルール別集計へ戻る
+          </Button>
+        </div>
+      )}
     </section>
   );
 }
