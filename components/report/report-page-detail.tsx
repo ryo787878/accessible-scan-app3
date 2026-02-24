@@ -40,6 +40,8 @@ export function ReportPageDetail({
   onFocusHandled,
 }: ReportPageDetailProps) {
   const sectionRef = useRef<HTMLElement | null>(null);
+  const inlineBackButtonRef = useRef<HTMLDivElement | null>(null);
+  const onFocusHandledRef = useRef(onFocusHandled);
   const successPages = scan.pages.filter((p) => p.status === "success");
   const failedPages = scan.pages.filter((p) => p.status === "failed");
   const [openItems, setOpenItems] = useState<string[]>([]);
@@ -73,6 +75,10 @@ export function ReportPageDetail({
   }, [successPages]);
 
   useEffect(() => {
+    onFocusHandledRef.current = onFocusHandled;
+  }, [onFocusHandled]);
+
+  useEffect(() => {
     if (!focusRuleId) return;
     const pageUrl = firstPageByRule.get(focusRuleId);
     if (!pageUrl) return;
@@ -80,17 +86,21 @@ export function ReportPageDetail({
     setOpenItems((prev) => (prev.includes(pageUrl) ? prev : [...prev, pageUrl]));
     window.setTimeout(() => {
       scrollToElementWithOffset(`rule-${focusRuleId}`);
-      onFocusHandled?.();
+      onFocusHandledRef.current?.();
     }, 120);
-  }, [focusRuleId, firstPageByRule, onFocusHandled]);
+  }, [focusRuleId, firstPageByRule]);
 
   useEffect(() => {
     const onScroll = () => {
       const section = sectionRef.current;
+      const inlineBackButton = inlineBackButtonRef.current;
       if (!section) return;
       const rect = section.getBoundingClientRect();
       const inView = rect.top < window.innerHeight * 0.7 && rect.bottom > window.innerHeight * 0.3;
-      setShowFloatingBack(inView);
+      const inlineVisible = inlineBackButton
+        ? inlineBackButton.getBoundingClientRect().top < window.innerHeight - 24
+        : false;
+      setShowFloatingBack(inView && !inlineVisible);
     };
 
     onScroll();
@@ -214,7 +224,7 @@ export function ReportPageDetail({
             ))}
           </Accordion>
         )}
-        <div className="flex justify-center pt-2">
+        <div ref={inlineBackButtonRef} className="flex justify-center pt-2">
           <Button
             type="button"
             variant="outline"

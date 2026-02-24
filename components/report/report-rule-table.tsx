@@ -38,7 +38,11 @@ export function ReportRuleTable({ scan, onRequestDetail }: ReportRuleTableProps)
         <Tabs defaultValue="all">
           <TabsList className="h-auto gap-1 p-1">
             {impactTabs.map((tab) => (
-              <TabsTrigger key={tab.value} value={tab.value} className="px-4 py-2">
+              <TabsTrigger
+                key={tab.value}
+                value={tab.value}
+                className="px-4 py-2 hover:bg-transparent hover:text-current"
+              >
                 {tab.label}
               </TabsTrigger>
             ))}
