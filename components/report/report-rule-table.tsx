@@ -76,7 +76,17 @@ export function ReportRuleTable({ scan }: ReportRuleTableProps) {
                           <TableRow
                             key={rule.ruleId}
                             className="cursor-pointer"
+                            role="button"
+                            tabIndex={0}
                             onClick={() => {
+                              const target = document.getElementById(`rule-${rule.ruleId}`);
+                              if (target) {
+                                target.scrollIntoView({ behavior: "smooth", block: "start" });
+                              }
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key !== "Enter" && e.key !== " ") return;
+                              e.preventDefault();
                               const target = document.getElementById(`rule-${rule.ruleId}`);
                               if (target) {
                                 target.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -97,7 +107,7 @@ export function ReportRuleTable({ scan }: ReportRuleTableProps) {
                                         </span>
                                       )}
                                       <span className="text-muted-foreground text-xs">
-                                        修正方法: {getQuickFixJa(rule.ruleId)}
+                                        修正方法: {getQuickFixJa(rule.ruleId, rule.impact)}
                                       </span>
                                     </>
                                   );

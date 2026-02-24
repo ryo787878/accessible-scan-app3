@@ -106,7 +106,7 @@ export function ReportPageDetail({ scan }: ReportPageDetailProps) {
                               <SeverityBadge impact={v.impact} />
                             </div>
                             <p className="text-muted-foreground text-xs">
-                              修正方法: {getQuickFixJa(v.id)}
+                              修正方法: {getQuickFixJa(v.id, v.impact)}
                             </p>
                           </CardHeader>
                           <CardContent className="flex flex-col gap-3 px-4 pt-0 pb-4">

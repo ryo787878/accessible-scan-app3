@@ -47,8 +47,26 @@ export function getAxeRuleJa(ruleId: string): string {
   return axeRuleJa[ruleId] ?? ruleId;
 }
 
-export function getQuickFixJa(ruleId: string): string {
-  return axeQuickFixJa[ruleId] ?? "まず該当要素の役割と名前を明確にし、axeの指摘箇所から1件ずつ修正してください。";
+export function getQuickFixJa(
+  ruleId: string,
+  impact?: "critical" | "serious" | "moderate" | "minor" | "unknown"
+): string {
+  if (axeQuickFixJa[ruleId]) {
+    return axeQuickFixJa[ruleId];
+  }
+
+  switch (impact) {
+    case "critical":
+      return "操作不能や情報欠落につながる問題です。まず代替テキスト・ラベル・名前付けを優先して修正してください。";
+    case "serious":
+      return "利用阻害が大きい問題です。コントラストやリンク名など、認知しづらい要素から優先的に修正してください。";
+    case "moderate":
+      return "構造上の問題です。見出し順序やランドマーク構造を整理して、ナビゲーションしやすい文書構造にしてください。";
+    case "minor":
+      return "軽微な問題です。ARIA属性や細かなマークアップを整えて品質を高めてください。";
+    default:
+      return "まず該当要素の役割と名前を明確にし、axeの指摘箇所から1件ずつ修正してください。";
+  }
 }
 
 /** 重大度の日本語ラベル */

@@ -56,7 +56,7 @@ export function ReportTopIssues({ scan }: ReportTopIssuesProps) {
                     <CardDescription className="leading-relaxed">
                       {issue.description}
                     </CardDescription>
-                    <p className="text-muted-foreground text-xs">修正方法: {getQuickFixJa(issue.ruleId)}</p>
+                    <p className="text-muted-foreground text-xs">修正方法: {getQuickFixJa(issue.ruleId, issue.impact)}</p>
                     <div className="text-muted-foreground flex flex-wrap items-center gap-4 text-xs">
                       <span>
                         該当ページ:{" "}
