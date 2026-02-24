@@ -1,40 +1,21 @@
 import type { Metadata } from "next";
 import { PageIntro } from "@/components/page-intro";
 import { PageShell } from "@/components/page-shell";
-import { JsonLd } from "@/components/seo/json-ld";
+import { BreadcrumbJsonLd } from "@/components/seo/jsonld/breadcrumb";
+import { FaqJsonLd } from "@/components/seo/jsonld/faq";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { absoluteUrl, ogImageUrl } from "@/lib/seo/site";
+import { buildPageMetadata, canonicalUrl } from "@/lib/seo/metadata";
 
 const title = "アクセシビリティ チェックツール比較";
 const description = "Webアクセシビリティ チェックとWCAG チェックの観点で、導入前に確認すべき比較ポイントを整理します。";
 const canonicalPath = "/ja/compare/accessibility-tools";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title,
+  path: canonicalPath,
   description,
-  alternates: {
-    canonical: canonicalPath,
-  },
-  openGraph: {
-    title,
-    description,
-    url: canonicalPath,
-    images: [
-      {
-        url: ogImageUrl("comparison", title),
-        width: 1200,
-        height: 630,
-        alt: title,
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title,
-    description,
-    images: [ogImageUrl("comparison", title)],
-  },
-};
+  ogType: "comparison",
+});
 
 const faqItems = [
   {
@@ -51,34 +32,17 @@ const faqItems = [
   },
 ];
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqItems.map((item) => ({
-    "@type": "Question",
-    name: item.q,
-    acceptedAnswer: {
-      "@type": "Answer",
-      text: item.a,
-    },
-  })),
-};
-
-const breadcrumbJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: [
-    { "@type": "ListItem", position: 1, name: "ホーム", item: absoluteUrl("/") },
-    { "@type": "ListItem", position: 2, name: "日本語ガイド", item: absoluteUrl("/ja") },
-    { "@type": "ListItem", position: 3, name: "比較", item: absoluteUrl(canonicalPath) },
-  ],
-};
-
 export default function CompareAccessibilityToolsPage() {
   return (
     <PageShell maxWidth="4xl">
-      <JsonLd data={faqJsonLd} />
-      <JsonLd data={breadcrumbJsonLd} />
+      <FaqJsonLd items={faqItems} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "ホーム", item: canonicalUrl("/") },
+          { name: "日本語ガイド", item: canonicalUrl("/ja") },
+          { name: "比較", item: canonicalUrl(canonicalPath) },
+        ]}
+      />
       <div className="flex flex-col gap-6">
         <PageIntro title="アクセシビリティ チェックツール比較" description="導入時の比較軸をまとめたページです。" />
         <div className="grid gap-4 md:grid-cols-3">

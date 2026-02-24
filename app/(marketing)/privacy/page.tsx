@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { LegalPageLayout } from "@/components/legal-page-layout";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "プライバシーポリシー",
+  path: "/privacy",
   description: "Accessible Scan のプライバシーポリシー",
-  alternates: { canonical: "/privacy" },
-};
+  ogType: "lp",
+});
 
 export default function PrivacyPage() {
   return (

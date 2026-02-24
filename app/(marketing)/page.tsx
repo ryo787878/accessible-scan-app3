@@ -1,19 +1,24 @@
 import type { Metadata } from "next";
 import { Shield, BarChart3, ListOrdered } from "lucide-react";
 import { ScanForm } from "@/components/scan-form";
+import { BreadcrumbJsonLd } from "@/components/seo/jsonld/breadcrumb";
+import { FaqJsonLd } from "@/components/seo/jsonld/faq";
 import { JsonLd } from "@/components/seo/json-ld";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { SITE_DESCRIPTION, SITE_TITLE, absoluteUrl, ogImageUrl } from "@/lib/seo/site";
+import { buildPageMetadata, canonicalUrl } from "@/lib/seo/metadata";
+import { SITE_DESCRIPTION } from "@/lib/seo/site";
 
-const pageTitle = SITE_TITLE;
+const pageTitle = "アクセシビリティ診断ツール | WCAGチェック対応";
 const canonicalPath = "/";
 
 export const metadata: Metadata = {
-  title: pageTitle,
-  description: SITE_DESCRIPTION,
-  alternates: {
-    canonical: canonicalPath,
-  },
+  ...buildPageMetadata({
+    title: pageTitle,
+    path: canonicalPath,
+    description: SITE_DESCRIPTION,
+    ogType: "lp",
+    ogTitle: "アクセシビリティ診断",
+  }),
   keywords: [
     "アクセシビリティ チェック",
     "アクセシビリティ 診断",
@@ -21,25 +26,6 @@ export const metadata: Metadata = {
     "アクセシビリティ テスト",
     "WCAG チェック",
   ],
-  openGraph: {
-    title: pageTitle,
-    description: SITE_DESCRIPTION,
-    url: canonicalPath,
-    images: [
-      {
-        url: ogImageUrl("lp", "アクセシビリティ診断"),
-        width: 1200,
-        height: 630,
-        alt: pageTitle,
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: pageTitle,
-    description: SITE_DESCRIPTION,
-    images: [ogImageUrl("lp", "アクセシビリティ診断")],
-  },
 };
 
 const features = [
@@ -80,43 +66,17 @@ const websiteJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: "Accessible Scan",
-  url: absoluteUrl(canonicalPath),
+  url: canonicalUrl(canonicalPath),
   inLanguage: "ja-JP",
   description: SITE_DESCRIPTION,
-};
-
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqItems.map((item) => ({
-    "@type": "Question",
-    name: item.q,
-    acceptedAnswer: {
-      "@type": "Answer",
-      text: item.a,
-    },
-  })),
-};
-
-const breadcrumbJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: [
-    {
-      "@type": "ListItem",
-      position: 1,
-      name: "ホーム",
-      item: absoluteUrl(canonicalPath),
-    },
-  ],
 };
 
 export default function HomePage() {
   return (
     <main className="flex min-h-[calc(100vh-3.5rem)] flex-col items-center px-4 py-10 md:py-10">
       <JsonLd data={websiteJsonLd} />
-      <JsonLd data={faqJsonLd} />
-      <JsonLd data={breadcrumbJsonLd} />
+      <FaqJsonLd items={faqItems} />
+      <BreadcrumbJsonLd items={[{ name: "ホーム", item: canonicalUrl(canonicalPath) }]} />
       <div className="flex w-full max-w-3xl flex-col gap-12">
         <section className="flex flex-col items-center gap-4 text-center">
           <div className="bg-primary flex size-20 items-center justify-center rounded-3xl">

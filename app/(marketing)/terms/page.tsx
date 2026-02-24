@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { LegalPageLayout } from "@/components/legal-page-layout";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "利用規約",
+  path: "/terms",
   description: "Accessible Scan の利用規約",
-  alternates: { canonical: "/terms" },
-};
+  ogType: "lp",
+});
 
 export default function TermsPage() {
   return (
