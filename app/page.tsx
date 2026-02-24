@@ -38,11 +38,13 @@ export default function HomePage() {
             <Shield className="size-4" aria-hidden="true" />
             WCAG 2.1 準拠チェック
           </div>
+          <div className="h-2" aria-hidden="true" />
           <h1 className="text-balance text-4xl font-bold tracking-tight md:text-5xl">
             Webアクセシビリティ
             <br />
             <span className="text-primary">自動診断ツール</span>
           </h1>
+          <div className="h-2" aria-hidden="true" />
           <p className="text-muted-foreground max-w-xl text-pretty text-base leading-relaxed md:text-lg">
             URLを入力するだけで、サイト全体のアクセシビリティを自動スキャン。
             検出された問題を日本語レポートで確認し、改善の優先順位を判断できます。
