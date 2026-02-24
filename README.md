@@ -133,6 +133,8 @@ curl -i https://access-scan.com/api/health
 
 詳細手順: [`docs/cicd-github-actions.md`](docs/cicd-github-actions.md)
 
+PostgreSQL切り替え時の引き継ぎ: [`docs/postgres-handover.md`](docs/postgres-handover.md)
+
 ### GitHub Variables（必須）
 
 - `VPS_HOST`: VPSホスト名またはIP
