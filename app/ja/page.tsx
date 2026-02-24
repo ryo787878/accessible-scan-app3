@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { PageIntro } from "@/components/page-intro";
+import { PageShell } from "@/components/page-shell";
 import { JsonLd } from "@/components/seo/json-ld";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { SITE_DESCRIPTION, absoluteUrl, ogImageUrl } from "@/lib/seo/site";
@@ -55,32 +57,36 @@ const breadcrumbJsonLd = {
 
 export default function JaHomePage() {
   return (
-    <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-10">
+    <PageShell maxWidth="4xl">
       <JsonLd data={breadcrumbJsonLd} />
-      <h1 className="text-3xl font-bold">アクセシビリティ対策ガイド</h1>
-      <p className="text-muted-foreground">比較記事と解説記事を集約したSEO向けの日本語ページです。</p>
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>比較ページ</CardTitle>
-            <CardDescription>
-              <Link href="/ja/compare/accessibility-tools" className="underline">
-                アクセシビリティ チェックツール比較
-              </Link>
-            </CardDescription>
-          </CardHeader>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>ブログ記事</CardTitle>
-            <CardDescription>
-              <Link href="/ja/blog/accessibility-check-guide" className="underline">
-                Webアクセシビリティ チェック実践ガイド
-              </Link>
-            </CardDescription>
-          </CardHeader>
-        </Card>
+      <div className="flex flex-col gap-6">
+        <PageIntro
+          title="アクセシビリティ対策ガイド"
+          description="比較記事と解説記事を集約したSEO向けの日本語ページです。"
+        />
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card className="bg-muted/40 border-0">
+            <CardHeader>
+              <CardTitle>比較ページ</CardTitle>
+              <CardDescription>
+                <Link href="/ja/compare/accessibility-tools" className="underline">
+                  アクセシビリティ チェックツール比較
+                </Link>
+              </CardDescription>
+            </CardHeader>
+          </Card>
+          <Card className="bg-muted/40 border-0">
+            <CardHeader>
+              <CardTitle>ブログ記事</CardTitle>
+              <CardDescription>
+                <Link href="/ja/blog/accessibility-check-guide" className="underline">
+                  Webアクセシビリティ チェック実践ガイド
+                </Link>
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
       </div>
-    </main>
+    </PageShell>
   );
 }

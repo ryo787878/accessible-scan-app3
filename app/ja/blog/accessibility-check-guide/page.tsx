@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { PageIntro } from "@/components/page-intro";
+import { PageShell } from "@/components/page-shell";
 import { JsonLd } from "@/components/seo/json-ld";
 import { absoluteUrl, ogImageUrl } from "@/lib/seo/site";
 
@@ -68,21 +70,26 @@ const breadcrumbJsonLd = {
 
 export default function AccessibilityCheckGuidePage() {
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-10">
+    <PageShell maxWidth="3xl">
       <JsonLd data={articleJsonLd} />
       <JsonLd data={breadcrumbJsonLd} />
-      <article className="space-y-4">
-        <h1 className="text-3xl font-bold">Webアクセシビリティ チェック実践ガイド</h1>
-        <p className="text-muted-foreground">公開日: 2026-02-24</p>
-        <p>
-          アクセシビリティ テストでは、まずテンプレート単位で代表ページを選定し、重大度の高い課題から修正します。
-          自動診断の結果をそのまま並べるのではなく、影響ユーザー数と改修工数で優先順位を決めるのが実務向きです。
-        </p>
-        <p>
-          次に、フォーム・モーダル・ナビゲーションの3領域を反復監査します。
-          ここは再発しやすいため、リリース前に同じチェック項目を毎回通す運用設計が有効です。
-        </p>
-      </article>
-    </main>
+      <div className="flex flex-col gap-6">
+        <PageIntro
+          title="Webアクセシビリティ チェック実践ガイド"
+          description={description}
+          meta="公開日: 2026-02-24"
+        />
+        <article className="prose prose-neutral dark:prose-invert max-w-none">
+          <p>
+            アクセシビリティ テストでは、まずテンプレート単位で代表ページを選定し、重大度の高い課題から修正します。
+            自動診断の結果をそのまま並べるのではなく、影響ユーザー数と改修工数で優先順位を決めるのが実務向きです。
+          </p>
+          <p>
+            次に、フォーム・モーダル・ナビゲーションの3領域を反復監査します。
+            ここは再発しやすいため、リリース前に同じチェック項目を毎回通す運用設計が有効です。
+          </p>
+        </article>
+      </div>
+    </PageShell>
   );
 }

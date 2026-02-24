@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
+import { PageShell } from "@/components/page-shell";
 import { ReportView } from "@/components/report/report-view";
 import { ogImageUrl } from "@/lib/seo/site";
 
@@ -53,27 +54,17 @@ export default async function ReportPage({
   const { publicId } = await params;
 
   return (
-    <main className="flex min-h-screen flex-col items-center px-4 py-12 md:py-5">
-      <div className="flex w-full max-w-4xl flex-col gap-6">
-        <nav aria-label="パンくずリスト">
-          <ol className="text-muted-foreground flex items-center gap-1.5 text-sm">
-            <li>
-              <Link href="/" className="hover:text-foreground transition-colors">
-                トップ
-              </Link>
-            </li>
-            <li aria-hidden="true">/</li>
-            <li>
-              <Link href={`/scan/${publicId}`} className="hover:text-foreground transition-colors">
-                診断進捗
-              </Link>
-            </li>
-            <li aria-hidden="true">/</li>
-            <li className="text-foreground font-medium">レポート</li>
-          </ol>
-        </nav>
+    <PageShell maxWidth="4xl">
+      <div className="flex flex-col gap-6">
+        <PageBreadcrumbs
+          items={[
+            { label: "トップ", href: "/" },
+            { label: "診断進捗", href: `/scan/${publicId}` },
+            { label: "レポート" },
+          ]}
+        />
         <ReportView publicId={publicId} />
       </div>
-    </main>
+    </PageShell>
   );
 }

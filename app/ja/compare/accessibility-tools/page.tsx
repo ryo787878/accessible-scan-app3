@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { PageIntro } from "@/components/page-intro";
+import { PageShell } from "@/components/page-shell";
 import { JsonLd } from "@/components/seo/json-ld";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { absoluteUrl, ogImageUrl } from "@/lib/seo/site";
@@ -74,42 +76,43 @@ const breadcrumbJsonLd = {
 
 export default function CompareAccessibilityToolsPage() {
   return (
-    <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-10">
+    <PageShell maxWidth="4xl">
       <JsonLd data={faqJsonLd} />
       <JsonLd data={breadcrumbJsonLd} />
-      <h1 className="text-3xl font-bold">アクセシビリティ チェックツール比較</h1>
-      <p className="text-muted-foreground">導入時の比較軸をまとめたページです。</p>
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader>
-            <CardTitle>基準対応</CardTitle>
-            <CardDescription>WCAG 2.1 AAの判定ロジックと更新頻度</CardDescription>
-          </CardHeader>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>レポート品質</CardTitle>
-            <CardDescription>重要度・影響範囲・修正優先度が明示されるか</CardDescription>
-          </CardHeader>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>運用性</CardTitle>
-            <CardDescription>継続スキャンと再診断のしやすさ</CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-      <section className="space-y-3" aria-label="比較FAQ">
-        <h2 className="text-xl font-semibold">FAQ</h2>
-        {faqItems.map((item) => (
-          <Card key={item.q}>
+      <div className="flex flex-col gap-6">
+        <PageIntro title="アクセシビリティ チェックツール比較" description="導入時の比較軸をまとめたページです。" />
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card className="bg-muted/40 border-0">
             <CardHeader>
-              <CardTitle className="text-base">{item.q}</CardTitle>
-              <CardDescription className="text-foreground/80">{item.a}</CardDescription>
+              <CardTitle>基準対応</CardTitle>
+              <CardDescription>WCAG 2.1 AAの判定ロジックと更新頻度</CardDescription>
             </CardHeader>
           </Card>
-        ))}
-      </section>
-    </main>
+          <Card className="bg-muted/40 border-0">
+            <CardHeader>
+              <CardTitle>レポート品質</CardTitle>
+              <CardDescription>重要度・影響範囲・修正優先度が明示されるか</CardDescription>
+            </CardHeader>
+          </Card>
+          <Card className="bg-muted/40 border-0">
+            <CardHeader>
+              <CardTitle>運用性</CardTitle>
+              <CardDescription>継続スキャンと再診断のしやすさ</CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+        <section className="space-y-3" aria-label="比較FAQ">
+          <h2 className="text-xl font-semibold">FAQ</h2>
+          {faqItems.map((item) => (
+            <Card key={item.q}>
+              <CardHeader>
+                <CardTitle className="text-base">{item.q}</CardTitle>
+                <CardDescription className="text-foreground/80">{item.a}</CardDescription>
+              </CardHeader>
+            </Card>
+          ))}
+        </section>
+      </div>
+    </PageShell>
   );
 }
