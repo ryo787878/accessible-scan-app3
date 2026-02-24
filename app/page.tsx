@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     url: canonicalPath,
     images: [
       {
-        url: ogImageUrl("lp", "アクセシビリティ チェック・診断"),
+        url: ogImageUrl("lp", "アクセシビリティ診断"),
         width: 1200,
         height: 630,
         alt: pageTitle,
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: pageTitle,
     description: SITE_DESCRIPTION,
-    images: [ogImageUrl("lp", "アクセシビリティ チェック・診断")],
+    images: [ogImageUrl("lp", "アクセシビリティ診断")],
   },
 };
 
@@ -128,9 +128,9 @@ export default function HomePage() {
           </div>
           <div className="h-2" aria-hidden="true" />
           <h1 className="text-balance text-4xl font-bold tracking-tight md:text-5xl">
-            アクセシビリティ チェック・診断
+            アクセシビリティ診断
             <br />
-            <span className="text-primary">Webアクセシビリティ テストツール</span>
+            <span className="text-primary">Webアクセシビリティチェック</span>
           </h1>
           <div className="h-2" aria-hidden="true" />
           <p className="text-muted-foreground max-w-xl text-pretty text-base leading-relaxed md:text-lg">

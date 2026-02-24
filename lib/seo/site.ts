@@ -1,7 +1,7 @@
 import { getSiteUrl } from "@/lib/site-url";
 
 export const SITE_NAME = "Accessible Scan";
-export const SITE_TITLE = "アクセシビリティ チェック・診断 | Webアクセシビリティ テスト対応（WCAG チェック）";
+export const SITE_TITLE = "アクセシビリティ診断ツール | WCAGチェック対応";
 export const SITE_DESCRIPTION =
   "アクセシビリティ チェックとアクセシビリティ 診断を自動化。Webアクセシビリティ チェック、アクセシビリティ テスト、WCAG チェックを日本語レポートで可視化します。";
 

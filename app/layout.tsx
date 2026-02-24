@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: ogImageUrl("lp", "アクセシビリティ チェック・診断"),
+        url: ogImageUrl("lp", "アクセシビリティ診断"),
         width: 1200,
         height: 630,
         alt: "Accessible Scan",
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
-    images: [ogImageUrl("lp", "アクセシビリティ チェック・診断")],
+    images: [ogImageUrl("lp", "アクセシビリティ診断")],
   },
   robots: {
     index: true,
