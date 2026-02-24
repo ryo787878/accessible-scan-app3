@@ -83,8 +83,13 @@ async function processScanPage(scanPageId: number, pageUrl: string): Promise<voi
     try {
       axe = await runAxe(page);
     } catch (error) {
-      await failPage(scanPageId, "axe_failed", `axe実行失敗: ${String(error)}`, status ?? undefined);
-      return;
+      try {
+        await page.waitForTimeout(500);
+        axe = await runAxe(page);
+      } catch (retryError) {
+        await failPage(scanPageId, "axe_failed", `axe実行失敗: ${String(retryError)}`, status ?? undefined);
+        return;
+      }
     }
 
     if (axe.violations.length > 0) {
@@ -138,6 +143,9 @@ export async function executeScan(publicId: string): Promise<void> {
 
     const candidates = await collectCandidateUrls(scan.normalizedRootUrl, scan.maxPages);
     const selected = prioritizeUrls(scan.normalizedRootUrl, candidates, scan.maxPages);
+    if (selected.length === 0) {
+      throw new Error("robots.txt のDisallow設定により診断対象ページが見つかりませんでした");
+    }
 
     await db.scanPage.createMany({
       data: selected.map((url, index) => ({

@@ -2,125 +2,62 @@ import AxeBuilder from "@axe-core/playwright";
 import axeCore from "axe-core";
 import type { Page } from "playwright";
 
-async function prepareAxeGlobals(page: Page): Promise<void> {
+type AxeRunResult = {
+  violations: Array<{
+    id: string;
+    impact?: string | null;
+    description: string;
+    help: string;
+    helpUrl: string;
+    tags?: string[];
+    nodes: Array<Record<string, unknown>>;
+  }>;
+};
+
+async function resetAxeRuntime(page: Page): Promise<void> {
   await page.evaluate(() => {
     const w = window as unknown as Record<string, unknown>;
-
-    if (!w.module) {
-      w.module = { exports: {} } as { exports: unknown };
-    } else if (
-      typeof w.module === "object" &&
-      w.module !== null &&
-      !("exports" in w.module)
-    ) {
-      (w.module as { exports?: unknown }).exports = {};
-    }
-
-    if (typeof w.exports === "undefined") {
-      w.exports = (w.module as { exports?: unknown }).exports;
-    }
+    try {
+      delete w.axe;
+    } catch {}
+    try {
+      delete w.module;
+    } catch {}
+    try {
+      delete w.exports;
+    } catch {}
   });
 }
 
-async function runAxeFallback(page: Page) {
-  return page.evaluate(
-    async (source) => {
-      const w = window as unknown as Record<string, unknown> & {
-        axe?: {
-          run: (
-            context?: Element | Document,
-            options?: Record<string, unknown>
-          ) => Promise<unknown>;
-        };
-        module?: { exports?: unknown } | unknown;
-      };
-
-      if (!w.module) {
-        w.module = { exports: {} } as { exports: unknown };
-      }
-
-      // Evaluate axe source directly in the same world where we run axe.
-      (0, eval)(source);
-
-      if (
-        !w.axe &&
-        typeof w.module === "object" &&
-        w.module !== null &&
-        "exports" in w.module
-      ) {
-        w.axe = (w.module as { exports?: unknown }).exports as typeof w.axe;
-      }
-
-      if (!w.axe || typeof w.axe.run !== "function") {
-        throw new Error("axe runtime unavailable");
-      }
-
-      return w.axe.run(document);
-    },
-    axeCore.source
-  ) as Promise<{
-    violations: Array<{
-      id: string;
-      impact?: string | null;
-      description: string;
-      help: string;
-      helpUrl: string;
-      tags?: string[];
-      nodes: Array<Record<string, unknown>>;
-    }>;
-  }>;
-}
-
-async function runAxeViaScriptTag(page: Page) {
+async function runAxeViaScriptTag(page: Page): Promise<AxeRunResult> {
+  await resetAxeRuntime(page);
   await page.addScriptTag({ content: axeCore.source });
+
   return page.evaluate(async () => {
     const w = window as unknown as Record<string, unknown> & {
       axe?: {
-        run: (
-          context?: Element | Document,
-          options?: Record<string, unknown>
-        ) => Promise<unknown>;
+        run: (context?: Element | Document, options?: Record<string, unknown>) => Promise<unknown>;
       };
-      module?: { exports?: unknown } | unknown;
     };
 
-    const axeRuntime =
-      w.axe ??
-      (typeof w.module === "object" && w.module !== null && "exports" in w.module
-        ? ((w.module as { exports?: unknown }).exports as typeof w.axe)
-        : undefined);
-
-    if (!axeRuntime || typeof axeRuntime.run !== "function") {
+    if (!w.axe || typeof w.axe.run !== "function") {
       throw new Error("axe runtime unavailable");
     }
 
-    return axeRuntime.run(document);
-  }) as Promise<{
-    violations: Array<{
-      id: string;
-      impact?: string | null;
-      description: string;
-      help: string;
-      helpUrl: string;
-      tags?: string[];
-      nodes: Array<Record<string, unknown>>;
-    }>;
-  }>;
+    return w.axe.run(document);
+  }) as Promise<AxeRunResult>;
 }
 
-export async function runAxe(page: Page) {
-  await prepareAxeGlobals(page);
-
+export async function runAxe(page: Page): Promise<AxeRunResult> {
   try {
-    return await new AxeBuilder({
-      page,
-      axeSource: axeCore.source,
-    }).analyze();
-  } catch (error) {
+    return (await new AxeBuilder({ page }).analyze()) as AxeRunResult;
+  } catch (firstError) {
     try {
       return await runAxeViaScriptTag(page);
-    } catch {
-      return runAxeFallback(page);
+    } catch (secondError) {
+      const firstMessage = firstError instanceof Error ? firstError.message : String(firstError);
+      const secondMessage = secondError instanceof Error ? secondError.message : String(secondError);
+      throw new Error(`axe analyze failed (builder): ${firstMessage} | (scriptTag): ${secondMessage}`);
     }
   }
 }
