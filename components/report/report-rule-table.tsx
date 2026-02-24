@@ -28,6 +28,12 @@ const impactTabs: { value: string; label: string }[] = [
 
 export function ReportRuleTable({ scan }: ReportRuleTableProps) {
   const aggregated = aggregateByRule(scan);
+  const scrollToRule = (ruleId: string) => {
+    const target = document.getElementById(`rule-${ruleId}`);
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
 
   return (
     <section aria-label="ルール別集計">
@@ -81,7 +87,13 @@ export function ReportRuleTable({ scan }: ReportRuleTableProps) {
                                   const shouldShowRuleId = localized !== rule.ruleId;
                                   return (
                                     <>
-                                      <span className="text-[15px] leading-6 font-medium">{localized}</span>
+                                      <button
+                                        type="button"
+                                        onClick={() => scrollToRule(rule.ruleId)}
+                                        className="w-fit text-left text-[15px] leading-6 font-medium hover:underline focus-visible:underline"
+                                      >
+                                        {localized}
+                                      </button>
                                       {shouldShowRuleId && (
                                         <span className="text-muted-foreground font-mono text-xs break-all">
                                           {rule.ruleId}
