@@ -44,17 +44,14 @@ const SEVERITY_STYLES: Record<KnownImpact, { bar: string; text: string }> = {
   },
 };
 
-function toPercent(value: number): number {
-  return Math.round(value * 100);
-}
-
 export function ScoreOverview({ scan }: ScoreOverviewProps) {
   const result = computeAccessibilityScore(scan);
   const maxCount = Math.max(1, ...Object.values(result.severityCounts));
-  const criticalSeriousPageRate = Math.max(
-    result.impactedPageRates.critical,
-    result.impactedPageRates.serious
-  );
+  const criticalSeriousPageCount = scan.pages.filter(
+    (page) =>
+      page.status === "success" &&
+      page.violations.some((v) => v.impact === "critical" || v.impact === "serious")
+  ).length;
 
   return (
     <section aria-label="スコア概要">
@@ -138,11 +135,11 @@ export function ScoreOverview({ scan }: ScoreOverviewProps) {
                       aria-hidden="true"
                     />
                     <span className="text-foreground text-xl font-bold tabular-nums">
-                      {toPercent(criticalSeriousPageRate)}%
+                      {criticalSeriousPageCount}
                     </span>
                   </div>
                   <span className="text-muted-foreground text-xs">
-                    重大/高 影響ページ率
+                    重大/高 影響ページ
                   </span>
                 </div>
                 <div className="flex flex-col items-center gap-1">
@@ -152,11 +149,11 @@ export function ScoreOverview({ scan }: ScoreOverviewProps) {
                       aria-hidden="true"
                     />
                     <span className="text-foreground text-xl font-bold tabular-nums">
-                      {toPercent(result.reliability.successRate)}%
+                      {result.pageCount}
                     </span>
                   </div>
                   <span className="text-muted-foreground text-xs">
-                    スキャン成功率
+                    診断ページ
                   </span>
                 </div>
               </div>
