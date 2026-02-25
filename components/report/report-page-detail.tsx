@@ -18,6 +18,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { ChevronUp } from "lucide-react";
 import type { Scan } from "@/lib/types";
+import { Badge } from "@/components/ui/badge";
+import { extractStandardTags, formatStandardTag } from "@/lib/axe-tags";
 
 interface ReportPageDetailProps {
   scan: Scan;
@@ -177,6 +179,11 @@ export function ReportPageDetail({
                                 {getAxeRuleJa(v.id)}
                               </CardTitle>
                               <SeverityBadge impact={v.impact} />
+                              {extractStandardTags(v.tags).map((tag) => (
+                                <Badge key={`${v.id}-${tag}`} variant="outline">
+                                  {formatStandardTag(tag)}
+                                </Badge>
+                              ))}
                             </div>
                             <p className="text-muted-foreground text-xs">
                               修正方法: {getQuickFixJa(v.id, v.impact)}

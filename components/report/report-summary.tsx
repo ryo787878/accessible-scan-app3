@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import type { Scan, Impact } from "@/lib/types";
+import { extractStandardTags } from "@/lib/axe-tags";
 
 interface ReportSummaryProps {
   scan: Scan;
@@ -98,6 +99,7 @@ export function aggregateByRule(scan: Scan) {
       pages: Set<string>;
       nodeCount: number;
       description: string;
+      standardTags: Set<string>;
     }
   >();
 
@@ -107,6 +109,9 @@ export function aggregateByRule(scan: Scan) {
       if (existing) {
         existing.pages.add(page.url);
         existing.nodeCount += v.nodes.length;
+        for (const tag of extractStandardTags(v.tags)) {
+          existing.standardTags.add(tag);
+        }
       } else {
         ruleMap.set(v.id, {
           ruleId: v.id,
@@ -114,6 +119,7 @@ export function aggregateByRule(scan: Scan) {
           pages: new Set([page.url]),
           nodeCount: v.nodes.length,
           description: v.description,
+          standardTags: new Set(extractStandardTags(v.tags)),
         });
       }
     }
@@ -123,6 +129,7 @@ export function aggregateByRule(scan: Scan) {
     .map((r) => ({
       ...r,
       pageCount: r.pages.size,
+      standardTags: Array.from(r.standardTags),
     }))
     .sort((a, b) => {
       const impactOrder: Record<Impact, number> = {

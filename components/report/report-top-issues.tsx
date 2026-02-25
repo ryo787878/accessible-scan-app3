@@ -10,6 +10,8 @@ import {
 import type { Scan } from "@/lib/types";
 import { aggregateByRule } from "@/components/report/report-summary";
 import { ExternalLink } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { formatStandardTag } from "@/lib/axe-tags";
 
 interface ReportTopIssuesProps {
   scan: Scan;
@@ -52,6 +54,11 @@ export function ReportTopIssues({ scan }: ReportTopIssuesProps) {
                         {getAxeRuleJa(issue.ruleId)}
                       </CardTitle>
                       <SeverityBadge impact={issue.impact} />
+                      {issue.standardTags.map((tag) => (
+                        <Badge key={`${issue.ruleId}-${tag}`} variant="outline" className="text-[10px]">
+                          {formatStandardTag(tag)}
+                        </Badge>
+                      ))}
                     </div>
                     <CardDescription className="leading-relaxed">
                       {issue.description}

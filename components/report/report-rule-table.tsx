@@ -3,6 +3,7 @@
 import { getAxeRuleJa, getQuickFixJa } from "@/lib/axe-ja";
 import { SeverityBadge } from "@/components/report/severity-badge";
 import { aggregateByRule } from "@/components/report/report-summary";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -13,6 +14,7 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Scan, Impact } from "@/lib/types";
+import { formatStandardTag } from "@/lib/axe-tags";
 
 interface ReportRuleTableProps {
   scan: Scan;
@@ -111,6 +113,15 @@ export function ReportRuleTable({ scan, onRequestDetail }: ReportRuleTableProps)
                                   <span className="text-muted-foreground text-xs leading-5 break-words">
                                     修正方法: {getQuickFixJa(rule.ruleId, rule.impact)}
                                   </span>
+                                  {rule.standardTags.length > 0 && (
+                                    <div className="flex flex-wrap gap-1">
+                                      {rule.standardTags.map((tag) => (
+                                        <Badge key={`${rule.ruleId}-${tag}`} variant="outline" className="text-[10px]">
+                                          {formatStandardTag(tag)}
+                                        </Badge>
+                                      ))}
+                                    </div>
+                                  )}
                                 </div>
                               </TableCell>
 
