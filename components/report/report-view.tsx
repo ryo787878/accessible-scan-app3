@@ -3,12 +3,14 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Loader2, XCircle, ExternalLink, ArrowLeft } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { ReportSummary } from "@/components/report/report-summary";
 import { ReportTopIssues } from "@/components/report/report-top-issues";
 import { ReportRuleTable } from "@/components/report/report-rule-table";
 import { ReportPageDetail } from "@/components/report/report-page-detail";
 import { ScoreOverview } from "@/components/report/score-overview";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Scan, ScanReportResponse } from "@/lib/types";
 
 interface ReportViewProps {
@@ -16,6 +18,7 @@ interface ReportViewProps {
 }
 
 export function ReportView({ publicId }: ReportViewProps) {
+  const { status } = useSession();
   const [scan, setScan] = useState<Scan | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -140,6 +143,7 @@ export function ReportView({ publicId }: ReportViewProps) {
 
   const scannedAt = new Date(scan.createdAt);
   const formattedDate = `${scannedAt.getFullYear()}年${scannedAt.getMonth() + 1}月${scannedAt.getDate()}日 ${String(scannedAt.getHours()).padStart(2, "0")}:${String(scannedAt.getMinutes()).padStart(2, "0")}`;
+  const isMember = status === "authenticated";
 
   return (
     <div className="flex flex-col gap-10">
@@ -167,15 +171,38 @@ export function ReportView({ publicId }: ReportViewProps) {
       {/* Top 5 Issues */}
       <ReportTopIssues scan={scan} />
 
-      {/* Rule Aggregate Table */}
-      <ReportRuleTable scan={scan} onRequestDetail={handleRequestDetail} />
+      {isMember ? (
+        <>
+          {/* Rule Aggregate Table */}
+          <ReportRuleTable scan={scan} onRequestDetail={handleRequestDetail} />
 
-      {/* Page Detail */}
-      <ReportPageDetail
-        scan={scan}
-        focusRuleId={focusRuleId}
-        onFocusHandled={() => setFocusRuleId(null)}
-      />
+          {/* Page Detail */}
+          <ReportPageDetail
+            scan={scan}
+            focusRuleId={focusRuleId}
+            onFocusHandled={() => setFocusRuleId(null)}
+          />
+        </>
+      ) : (
+        <section aria-label="会員限定詳細">
+          <Card className="border-2">
+            <CardHeader>
+              <CardTitle className="text-lg">会員限定の詳細レポート</CardTitle>
+              <CardDescription>
+                「ルール別集計」と「ページ別詳細」は会員登録後に閲覧できます。
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-3 sm:flex-row">
+              <Button asChild className="sm:flex-1">
+                <Link href={`/login?callbackUrl=/report/${publicId}`}>ログイン</Link>
+              </Button>
+              <Button asChild variant="outline" className="sm:flex-1">
+                <Link href={`/login?callbackUrl=/report/${publicId}`}>会員登録</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </section>
+      )}
 
       {/* Back action */}
       <div className="mt-4 flex flex-col items-center gap-4 border-t pt-8 md:mt-6">

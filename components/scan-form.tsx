@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Search, Loader2 } from "lucide-react";
-import { signIn, useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -21,7 +20,6 @@ import {
 
 export function ScanForm() {
   const router = useRouter();
-  const { status } = useSession();
   const [url, setUrl] = useState("");
   const [maxPages, setMaxPages] = useState(10);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -62,14 +60,6 @@ export function ScanForm() {
       return;
     }
 
-    if (status !== "authenticated") {
-      toast.info("ログインが必要です", {
-        description: "診断を開始するには Google ログインしてください。",
-      });
-      await signIn("google", { callbackUrl: "/" });
-      return;
-    }
-
     setIsSubmitting(true);
 
     try {
@@ -85,11 +75,6 @@ export function ScanForm() {
           toast.error("レート制限", {
             description: data.error,
           });
-        } else if (res.status === 401) {
-          toast.error("認証エラー", {
-            description: "ログイン状態を確認して再試行してください。",
-          });
-          await signIn("google", { callbackUrl: "/" });
         } else {
           toast.error("エラー", {
             description: data.error ?? "診断の開始に失敗しました",
@@ -229,7 +214,7 @@ export function ScanForm() {
           <Button
             type="submit"
             size="lg"
-            disabled={isSubmitting || !hasAuthorization || !acceptedTerms || status === "loading"}
+            disabled={isSubmitting || !hasAuthorization || !acceptedTerms}
             className="w-full text-base"
           >
             {isSubmitting ? (

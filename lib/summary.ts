@@ -33,11 +33,11 @@ function toPageStatus(status: string): NonNullable<Scan["pages"]>[number]["statu
   return "failed";
 }
 
-export async function buildScanView(publicId: string, userId: string): Promise<Scan | null> {
+export async function buildScanView(publicId: string): Promise<Scan | null> {
   await ensureDbSchema();
   await recoverStaleScans();
   const scan = await db.scan.findFirst({
-    where: { publicId, userId },
+    where: { publicId },
     include: {
       pages: {
         include: { violations: true },
@@ -91,8 +91,8 @@ export async function buildScanView(publicId: string, userId: string): Promise<S
   };
 }
 
-export async function buildScanReport(publicId: string, userId: string): Promise<ScanReportResponse | null> {
-  const scan = await buildScanView(publicId, userId);
+export async function buildScanReport(publicId: string): Promise<ScanReportResponse | null> {
+  const scan = await buildScanView(publicId);
   if (!scan) return null;
 
   const totalViolations = scan.pages.reduce((sum, page) => sum + page.violations.reduce((acc, v) => acc + v.nodes.length, 0), 0);

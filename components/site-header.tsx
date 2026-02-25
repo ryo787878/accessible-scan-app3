@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Shield } from "lucide-react";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 
 export function SiteHeader() {
@@ -53,12 +53,8 @@ export function SiteHeader() {
               </Button>
             </>
           ) : (
-            <Button
-              type="button"
-              size="sm"
-              onClick={() => signIn("google", { callbackUrl: "/" })}
-            >
-              Googleでログイン
+            <Button asChild type="button" size="sm">
+              <Link href="/login">ログイン</Link>
             </Button>
           )}
         </div>

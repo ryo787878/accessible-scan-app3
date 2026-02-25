@@ -80,7 +80,7 @@ npm run build
 - `GET /api/scans/[publicId]/report`
 - `GET /api/health`
 
-会員機能有効時は `POST /api/scans` とスキャン結果系APIはログインが必要です。
+会員未登録でも無料診断の実行とレポート閲覧は可能ですが、`ルール別集計` と `ページ別詳細` は会員限定です。
 
 `POST /api/scans` の必須入力:
 

@@ -88,9 +88,6 @@ function getClientKey(request: NextRequest): string {
 export async function POST(request: NextRequest) {
   const session = await auth();
   const userId = session?.user?.id;
-  if (!userId) {
-    return NextResponse.json({ error: "ログインが必要です" }, { status: 401 });
-  }
 
   if (!isSameOriginRequest(request)) {
     return NextResponse.json({ error: "不正なオリジンです" }, { status: 403 });
@@ -143,7 +140,7 @@ export async function POST(request: NextRequest) {
         inputUrl: validated.inputUrl,
         normalizedRootUrl: validated.normalizedRootUrl,
         maxPages: validated.maxPages,
-        userId,
+        userId: userId ?? null,
         status: "queued",
       },
     });
