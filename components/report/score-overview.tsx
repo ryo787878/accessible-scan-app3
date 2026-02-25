@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { ScoreGauge } from "@/components/report/score-gauge";
 import { computeAccessibilityScore } from "@/lib/score";
 import { getImpactLabel } from "@/lib/axe-ja";
@@ -13,7 +14,6 @@ import type { Scan, Impact } from "@/lib/types";
 import {
   AlertTriangle,
   FileSearch,
-  CheckCircle2,
   ShieldAlert,
 } from "lucide-react";
 
@@ -44,9 +44,17 @@ const SEVERITY_STYLES: Record<KnownImpact, { bar: string; text: string }> = {
   },
 };
 
+function toPercent(value: number): number {
+  return Math.round(value * 100);
+}
+
 export function ScoreOverview({ scan }: ScoreOverviewProps) {
   const result = computeAccessibilityScore(scan);
   const maxCount = Math.max(1, ...Object.values(result.severityCounts));
+  const criticalSeriousPageRate = Math.max(
+    result.impactedPageRates.critical,
+    result.impactedPageRates.serious
+  );
 
   return (
     <section aria-label="スコア概要">
@@ -59,19 +67,24 @@ export function ScoreOverview({ scan }: ScoreOverviewProps) {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center gap-8 md:flex-row md:items-start">
-            {/* Score gauge */}
             <div className="flex shrink-0 flex-col items-center gap-3">
               <ScoreGauge result={result} />
-              <p className="text-muted-foreground max-w-48 text-center text-xs leading-relaxed">
+              <p className="text-muted-foreground max-w-56 text-center text-xs leading-relaxed">
                 WCAG 2.1 AA基準に基づく
                 <br />
-                自動検出可能な項目のスコア
+                自動検出項目の影響ページ率重視スコア
               </p>
+              <Badge variant={result.reliability.level === "low" ? "destructive" : "outline"}>
+                スキャン信頼度: {result.reliability.label}
+              </Badge>
+              {result.reliability.level === "low" && (
+                <p className="text-destructive max-w-56 text-center text-xs">
+                  信頼度低: 取得失敗またはスキップページが多いため、手動再検査を推奨します。
+                </p>
+              )}
             </div>
 
-            {/* Right column: severity breakdown + stats */}
             <div className="flex min-w-0 flex-1 flex-col gap-6">
-              {/* Severity breakdown bars */}
               <div className="flex flex-col gap-3">
                 <h3 className="text-sm font-semibold">重大度別の内訳</h3>
                 <div className="flex flex-col gap-2.5">
@@ -103,7 +116,6 @@ export function ScoreOverview({ scan }: ScoreOverviewProps) {
                 </div>
               </div>
 
-              {/* Quick stats row */}
               <div className="grid grid-cols-3 gap-4 border-t pt-4">
                 <div className="flex flex-col items-center gap-1">
                   <div className="flex items-center gap-1.5">
@@ -121,30 +133,30 @@ export function ScoreOverview({ scan }: ScoreOverviewProps) {
                 </div>
                 <div className="flex flex-col items-center gap-1">
                   <div className="flex items-center gap-1.5">
+                    <ShieldAlert
+                      className="text-muted-foreground size-3.5"
+                      aria-hidden="true"
+                    />
+                    <span className="text-foreground text-xl font-bold tabular-nums">
+                      {toPercent(criticalSeriousPageRate)}%
+                    </span>
+                  </div>
+                  <span className="text-muted-foreground text-xs">
+                    重大/高 影響ページ率
+                  </span>
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                  <div className="flex items-center gap-1.5">
                     <FileSearch
                       className="text-muted-foreground size-3.5"
                       aria-hidden="true"
                     />
                     <span className="text-foreground text-xl font-bold tabular-nums">
-                      {result.pageCount}
+                      {toPercent(result.reliability.successRate)}%
                     </span>
                   </div>
                   <span className="text-muted-foreground text-xs">
-                    診断ページ
-                  </span>
-                </div>
-                <div className="flex flex-col items-center gap-1">
-                  <div className="flex items-center gap-1.5">
-                    <CheckCircle2
-                      className="text-muted-foreground size-3.5"
-                      aria-hidden="true"
-                    />
-                    <span className="text-foreground text-xl font-bold tabular-nums">
-                      {result.passedRules}
-                    </span>
-                  </div>
-                  <span className="text-muted-foreground text-xs">
-                    合格ルール
+                    スキャン成功率
                   </span>
                 </div>
               </div>

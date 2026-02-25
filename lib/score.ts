@@ -1,26 +1,106 @@
 import type { Impact, Scan } from "@/lib/types";
 
 type KnownImpact = Exclude<Impact, "unknown">;
+type ReliabilityLevel = "high" | "medium" | "low";
 
-const SEVERITY_WEIGHTS: Record<KnownImpact, number> = {
-  critical: 8,
-  serious: 5,
-  moderate: 3,
-  minor: 1,
+const MAX_DEDUCTION_BY_SEVERITY: Record<KnownImpact, number> = {
+  critical: 55,
+  serious: 35,
+  moderate: 20,
+  minor: 10,
 };
-
-const TOTAL_RULES_ESTIMATE = 18;
-const MAX_DEDUCTION = 100;
 
 export interface ScoreResult {
   score: number;
   grade: "good" | "needs-work" | "poor";
   label: string;
   severityCounts: Record<KnownImpact, number>;
+  impactedPageCounts: Record<KnownImpact, number>;
+  impactedPageRates: Record<KnownImpact, number>;
   totalNodes: number;
   uniqueRules: number;
-  passedRules: number;
   pageCount: number;
+  reliability: {
+    level: ReliabilityLevel;
+    label: "高" | "中" | "低";
+    message: string;
+    successPages: number;
+    failedPages: number;
+    skippedPages: number;
+    totalPages: number;
+    successRate: number;
+  };
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
+}
+
+function computeSeverityDeduction(
+  impact: KnownImpact,
+  pageRate: number,
+  nodeCount: number
+): number {
+  const safeRate = clamp(pageRate, 0, 1);
+  const scale = Math.log10(nodeCount + 1);
+
+  switch (impact) {
+    case "critical": {
+      // 少数ページでも大きく減点し、影響ページ率が高いほど急激に悪化させる。
+      const deduction = 25 + safeRate * 40 + scale * 5;
+      return clamp(deduction, 0, MAX_DEDUCTION_BY_SEVERITY.critical);
+    }
+    case "serious": {
+      const deduction = safeRate * 28 + scale * 4;
+      return clamp(deduction, 0, MAX_DEDUCTION_BY_SEVERITY.serious);
+    }
+    case "moderate": {
+      const deduction = safeRate * 14 + scale * 3;
+      return clamp(deduction, 0, MAX_DEDUCTION_BY_SEVERITY.moderate);
+    }
+    case "minor": {
+      // minor は逓減: ページ率は平方根で圧縮し、過剰減点を防ぐ。
+      const deduction = Math.sqrt(safeRate) * 8 + scale * 1.5;
+      return clamp(deduction, 0, MAX_DEDUCTION_BY_SEVERITY.minor);
+    }
+  }
+}
+
+function computeReliability(scan: Scan, successPages: number): ScoreResult["reliability"] {
+  const totalPages = scan.pages.length;
+  const failedPages = scan.pages.filter((p) => p.status === "failed").length;
+  const skippedPages = scan.pages.filter((p) => p.status === "skipped").length;
+
+  const successRate = totalPages > 0 ? successPages / totalPages : 0;
+
+  let level: ReliabilityLevel;
+  let label: "高" | "中" | "低";
+  let message: string;
+
+  if (successRate >= 0.9 && failedPages + skippedPages <= 1) {
+    level = "high";
+    label = "高";
+    message = "スコアの信頼性は高いです。";
+  } else if (successRate >= 0.7) {
+    level = "medium";
+    label = "中";
+    message = "一部ページ未取得のため、目安として確認してください。";
+  } else {
+    level = "low";
+    label = "低";
+    message = "失敗/スキップページが多く、信頼度が低い結果です。";
+  }
+
+  return {
+    level,
+    label,
+    message,
+    successPages,
+    failedPages,
+    skippedPages,
+    totalPages,
+    successRate,
+  };
 }
 
 export function computeAccessibilityScore(scan: Scan): ScoreResult {
@@ -34,28 +114,59 @@ export function computeAccessibilityScore(scan: Scan): ScoreResult {
     minor: 0,
   };
 
+  const impactedPagesBySeverity: Record<KnownImpact, Set<string>> = {
+    critical: new Set(),
+    serious: new Set(),
+    moderate: new Set(),
+    minor: new Set(),
+  };
+
   let totalNodes = 0;
-  for (const v of allViolations) {
-    if (v.impact === "unknown") {
-      severityCounts.minor += v.nodes.length;
-    } else {
-      severityCounts[v.impact] += v.nodes.length;
+
+  for (const page of successPages) {
+    for (const v of page.violations) {
+      const impact: KnownImpact = v.impact === "unknown" ? "minor" : v.impact;
+      severityCounts[impact] += v.nodes.length;
+      if (v.nodes.length > 0) {
+        impactedPagesBySeverity[impact].add(page.url);
+      }
+      totalNodes += v.nodes.length;
     }
-    totalNodes += v.nodes.length;
   }
 
-  // 重み付き減点を算出
-  let deduction = 0;
-  for (const [impact, count] of Object.entries(severityCounts) as [KnownImpact, number][]) {
-    deduction += SEVERITY_WEIGHTS[impact] * count;
-  }
+  const pageCount = successPages.length;
+  const impactedPageCounts: Record<KnownImpact, number> = {
+    critical: impactedPagesBySeverity.critical.size,
+    serious: impactedPagesBySeverity.serious.size,
+    moderate: impactedPagesBySeverity.moderate.size,
+    minor: impactedPagesBySeverity.minor.size,
+  };
 
-  // 0-100にクランプ（対数的に減衰させて極端な0を避ける）
-  const normalizedDeduction = Math.min(
-    MAX_DEDUCTION,
-    (deduction / (deduction + 20)) * MAX_DEDUCTION
+  const impactedPageRates: Record<KnownImpact, number> = {
+    critical: pageCount > 0 ? impactedPageCounts.critical / pageCount : 0,
+    serious: pageCount > 0 ? impactedPageCounts.serious / pageCount : 0,
+    moderate: pageCount > 0 ? impactedPageCounts.moderate / pageCount : 0,
+    minor: pageCount > 0 ? impactedPageCounts.minor / pageCount : 0,
+  };
+
+  const criticalDeduction = impactedPageCounts.critical > 0
+    ? computeSeverityDeduction("critical", impactedPageRates.critical, severityCounts.critical)
+    : 0;
+  const seriousDeduction = computeSeverityDeduction(
+    "serious",
+    impactedPageRates.serious,
+    severityCounts.serious
   );
-  const score = Math.round(Math.max(0, 100 - normalizedDeduction));
+  const moderateDeduction = computeSeverityDeduction(
+    "moderate",
+    impactedPageRates.moderate,
+    severityCounts.moderate
+  );
+  const minorDeduction = computeSeverityDeduction("minor", impactedPageRates.minor, severityCounts.minor);
+
+  const rawDeduction = criticalDeduction + seriousDeduction + moderateDeduction + minorDeduction;
+  const totalDeduction = clamp(rawDeduction, 0, 95);
+  const score = Math.round(clamp(100 - totalDeduction, 0, 100));
 
   const uniqueRules = new Set(allViolations.map((v) => v.id)).size;
 
@@ -77,9 +188,11 @@ export function computeAccessibilityScore(scan: Scan): ScoreResult {
     grade,
     label,
     severityCounts,
+    impactedPageCounts,
+    impactedPageRates,
     totalNodes,
     uniqueRules,
-    passedRules: Math.max(0, TOTAL_RULES_ESTIMATE - uniqueRules),
-    pageCount: successPages.length,
+    pageCount,
+    reliability: computeReliability(scan, successPages.length),
   };
 }

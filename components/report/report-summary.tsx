@@ -60,7 +60,7 @@ export function ReportSummary({ scan }: ReportSummaryProps) {
       color: "text-primary" as const,
     },
     {
-      label: "合格ルール数",
+      label: "推定合格ルール数",
       value: passedRules,
       icon: CheckCircle2,
       color: "text-emerald-600" as const,
