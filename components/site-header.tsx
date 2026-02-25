@@ -1,16 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { Shield } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 
 export function SiteHeader() {
-  const pathname = usePathname();
   const { data: session, status } = useSession();
-
-  const isHome = pathname === "/";
 
   return (
     <header className="bg-background/80 sticky top-0 z-50 w-full border-b backdrop-blur-sm">
@@ -27,16 +23,6 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        {!isHome && (
-          <nav aria-label="メインナビゲーション">
-            <Link
-              href="/"
-              className="text-muted-foreground hover:text-foreground text-sm transition-colors"
-            >
-              新しい診断を開始
-            </Link>
-          </nav>
-        )}
         <div className="flex items-center gap-2">
           {status === "authenticated" ? (
             <>
