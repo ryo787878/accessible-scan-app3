@@ -3,9 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Shield } from "lucide-react";
+import { signIn, signOut, useSession } from "next-auth/react";
+import { Button } from "@/components/ui/button";
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const { data: session, status } = useSession();
 
   const isHome = pathname === "/";
 
@@ -34,6 +37,31 @@ export function SiteHeader() {
             </Link>
           </nav>
         )}
+        <div className="flex items-center gap-2">
+          {status === "authenticated" ? (
+            <>
+              <span className="text-muted-foreground hidden text-xs sm:inline">
+                {session.user.email}
+              </span>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => signOut({ callbackUrl: "/" })}
+              >
+                ログアウト
+              </Button>
+            </>
+          ) : (
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => signIn("google", { callbackUrl: "/" })}
+            >
+              Googleでログイン
+            </Button>
+          )}
+        </div>
       </div>
     </header>
   );

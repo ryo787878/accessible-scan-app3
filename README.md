@@ -32,6 +32,19 @@ npx prisma generate
 npx prisma migrate dev
 ```
 
+5. Google OAuth の環境変数を設定（会員機能）
+
+```dotenv
+AUTH_SECRET=replace-with-long-random-string
+AUTH_GOOGLE_ID=your-google-client-id
+AUTH_GOOGLE_SECRET=your-google-client-secret
+```
+
+Google Cloud Console の OAuth 設定では、リダイレクトURIに以下を追加してください。
+
+- 開発: `http://localhost:3000/api/auth/callback/google`
+- 本番: `https://access-scan.com/api/auth/callback/google`
+
 ## 起動
 
 ```bash
@@ -66,6 +79,8 @@ npm run build
 - `GET /api/scans/[publicId]`
 - `GET /api/scans/[publicId]/report`
 - `GET /api/health`
+
+会員機能有効時は `POST /api/scans` とスキャン結果系APIはログインが必要です。
 
 `POST /api/scans` の必須入力:
 

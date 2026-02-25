@@ -10,6 +10,7 @@ datasource db {
 model Scan {
   id                Int        @id @default(autoincrement())
   publicId          String     @unique
+  userId            String?
   inputUrl          String
   normalizedRootUrl String
   status            String     @default("queued")
@@ -19,7 +20,10 @@ model Scan {
   errorMessage      String?
   createdAt         DateTime   @default(now())
   updatedAt         DateTime   @updatedAt
+  user              User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
   pages             ScanPage[]
+
+  @@index([userId, createdAt])
 }
 
 model ScanPage {
@@ -59,4 +63,60 @@ model AxeViolation {
   scanPage ScanPage @relation(fields: [scanPageId], references: [id], onDelete: Cascade)
 
   @@index([scanPageId])
+}
+
+model User {
+  id                 String    @id @default(cuid())
+  name               String?
+  email              String?   @unique
+  emailVerified      DateTime?
+  image              String?
+  stripeCustomerId   String?   @unique
+  subscriptionPlan   String?   @default("free")
+  subscriptionStatus String?   @default("inactive")
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  accounts           Account[]
+  sessions           Session[]
+  scans              Scan[]
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([sessionToken])
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
 }

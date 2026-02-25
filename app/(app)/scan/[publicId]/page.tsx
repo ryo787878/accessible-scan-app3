@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { auth } from "@/auth";
 import { ScanProgress } from "@/components/scan-progress";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { shouldNoIndexPath } from "@/lib/seo/indexing";
@@ -27,6 +29,11 @@ export default async function ScanPage({
 }: {
   params: Promise<{ publicId: string }>;
 }) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    redirect("/");
+  }
+
   const { publicId } = await params;
 
   return (

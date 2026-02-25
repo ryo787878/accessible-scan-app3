@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Toaster } from "sonner";
+import { AuthSessionProvider } from "@/components/auth/session-provider";
 import { ScrollToTopOnRouteChange } from "@/components/scroll-to-top-on-route-change";
 import { SITE_TITLE, siteUrl } from "@/lib/seo/site";
 import "./globals.css";
@@ -42,9 +43,11 @@ export default function RootLayout({
             </Script>
           </>
         ) : null}
-        <ScrollToTopOnRouteChange />
-        {children}
-        <Toaster position="top-right" richColors />
+        <AuthSessionProvider>
+          <ScrollToTopOnRouteChange />
+          {children}
+          <Toaster position="top-right" richColors />
+        </AuthSessionProvider>
       </body>
     </html>
   );

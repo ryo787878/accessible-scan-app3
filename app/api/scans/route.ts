@@ -3,6 +3,7 @@ import net from "node:net";
 import { createHash } from "node:crypto";
 import { TextDecoder } from "node:util";
 import { nanoid } from "nanoid";
+import { auth } from "@/auth";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { validateInput } from "@/lib/validation";
 import { db } from "@/lib/db";
@@ -85,6 +86,12 @@ function getClientKey(request: NextRequest): string {
 }
 
 export async function POST(request: NextRequest) {
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) {
+    return NextResponse.json({ error: "ログインが必要です" }, { status: 401 });
+  }
+
   if (!isSameOriginRequest(request)) {
     return NextResponse.json({ error: "不正なオリジンです" }, { status: 403 });
   }
@@ -136,6 +143,7 @@ export async function POST(request: NextRequest) {
         inputUrl: validated.inputUrl,
         normalizedRootUrl: validated.normalizedRootUrl,
         maxPages: validated.maxPages,
+        userId,
         status: "queued",
       },
     });

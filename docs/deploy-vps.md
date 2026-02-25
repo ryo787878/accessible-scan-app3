@@ -48,6 +48,9 @@ NODE_ENV=production
 PORT=3000
 APP_BASE_URL=https://access-scan.com
 DATABASE_URL=postgresql://accessible_scan:<password>@127.0.0.1:5432/accessible_scan?schema=public
+AUTH_SECRET=replace-with-long-random-string
+AUTH_GOOGLE_ID=your-google-client-id
+AUTH_GOOGLE_SECRET=your-google-client-secret
 ```
 
 ## 5. systemdで常駐化

@@ -9,6 +9,7 @@ const mockEnqueue = vi.fn();
 const mockValidateInput = vi.fn();
 const mockBuildScanView = vi.fn();
 const mockBuildScanReport = vi.fn();
+const mockAuth = vi.fn();
 
 vi.mock("@/lib/db", () => ({
   db: {
@@ -40,9 +41,18 @@ vi.mock("@/lib/db-init", () => ({
   ensureDbSchema: vi.fn().mockResolvedValue(undefined),
 }));
 
+vi.mock("@/auth", () => ({
+  auth: mockAuth,
+}));
+
 describe("scan api routes", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockAuth.mockResolvedValue({
+      user: {
+        id: "user_test_1",
+      },
+    });
     mockEnqueue.mockReturnValue({ accepted: true });
     mockFindMany.mockResolvedValue([]);
     mockScanUpdate.mockResolvedValue(undefined);
@@ -81,6 +91,13 @@ describe("scan api routes", () => {
     expect(res.status).toBe(201);
     expect(body.publicId).toBe("scan_abc123def4");
     expect(mockEnqueue).toHaveBeenCalledWith("scan_abc123def4");
+    expect(mockCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          userId: "user_test_1",
+        }),
+      })
+    );
   });
 
   it("POST /api/scans returns 400 for invalid url", async () => {
@@ -187,6 +204,7 @@ describe("scan api routes", () => {
     expect(res.status).toBe(200);
     expect(body.status).toBe("running");
     expect(body.progress.processedPages).toBe(3);
+    expect(mockBuildScanView).toHaveBeenCalledWith("scan_abc123def4", "user_test_1");
   });
 
   it("GET /api/scans/[publicId] returns 400 for invalid id", async () => {
@@ -229,6 +247,7 @@ describe("scan api routes", () => {
     expect(res.status).toBe(200);
     expect(body.publicId).toBe("scan_abc123def4");
     expect(body.status).toBe("completed");
+    expect(mockBuildScanReport).toHaveBeenCalledWith("scan_abc123def4", "user_test_1");
   });
 
   it("GET /api/scans/[publicId]/report returns 400 for invalid id", async () => {
