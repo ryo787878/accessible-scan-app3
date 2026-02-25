@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { getAxeRuleJa, getQuickFixJa } from "@/lib/axe-ja";
+import { getAxeRuleJa, getQuickFixJa, getRuleGuidanceJa } from "@/lib/axe-ja";
 import { SeverityBadge } from "@/components/report/severity-badge";
 import {
   Accordion,
@@ -16,9 +16,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronUp } from "lucide-react";
-import type { Scan } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
+import { ChevronUp } from "lucide-react";
+import type { IncompleteCheck, Scan, Violation } from "@/lib/types";
 import { extractStandardTags, formatStandardTag } from "@/lib/axe-tags";
 
 interface ReportPageDetailProps {
@@ -34,6 +34,91 @@ function scrollToElementWithOffset(elementId: string) {
   if (!target) return;
   const top = target.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
   window.scrollTo({ top, behavior: "smooth" });
+}
+
+function IssueCard({
+  issue,
+  pageUrl,
+  attachAnchor,
+  isManual,
+}: {
+  issue: Violation | IncompleteCheck;
+  pageUrl: string;
+  attachAnchor: boolean;
+  isManual: boolean;
+}) {
+  const guidance = getRuleGuidanceJa(issue.id);
+
+  return (
+    <Card
+      id={attachAnchor ? `rule-${issue.id}` : undefined}
+      className="bg-muted/30 border-0 shadow-none"
+    >
+      <CardHeader className="p-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <CardTitle className="text-sm">{getAxeRuleJa(issue.id)}</CardTitle>
+          <SeverityBadge impact={issue.impact} />
+          <Badge variant={isManual ? "outline" : "secondary"}>
+            {isManual ? "手動確認" : "自動検出"}
+          </Badge>
+          {extractStandardTags(issue.tags).map((tag) => (
+            <Badge key={`${issue.id}-${tag}`} variant="outline" className="text-[10px]">
+              {formatStandardTag(tag)}
+            </Badge>
+          ))}
+        </div>
+        <p className="text-muted-foreground text-xs">
+          どう直すか: {getQuickFixJa(issue.id, issue.impact)}
+        </p>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-3 px-4 pt-0 pb-4">
+        {isManual && (
+          <div className="rounded-md border bg-background p-3 text-xs">
+            <p className="font-medium">確認方法</p>
+            <p className="text-muted-foreground mt-1">
+              {(guidance?.manualMethods ?? ["キーボード", "目視", "スクリーンリーダー"]).join(" / ")}
+            </p>
+            <p className="mt-2 font-medium">確認ポイント</p>
+            <ul className="text-muted-foreground mt-1 list-disc space-y-1 pl-5">
+              {(guidance?.manualPoints ?? guidance?.checkpoints ?? ["対象要素の目的が伝わる", "操作時に読み上げと表示が一致する"]).slice(0, 3).map((point) => (
+                <li key={point}>{point}</li>
+              ))}
+            </ul>
+            <p className="mt-2 font-medium">判定記録</p>
+            <p className="text-muted-foreground mt-1">OK / 問題あり / 保留</p>
+          </div>
+        )}
+
+        {issue.nodes.map((node, nodeIdx) => (
+          <div
+            key={`${pageUrl}-${issue.id}-${nodeIdx}`}
+            className="flex flex-col gap-2 rounded-md border bg-background p-3"
+          >
+            <div className="flex flex-col gap-1">
+              <span className="text-muted-foreground text-xs font-medium">対象要素</span>
+              <code className="bg-muted overflow-x-auto rounded px-2 py-1 text-xs break-all">
+                {node.html}
+              </code>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-muted-foreground text-xs font-medium">セレクタ</span>
+              <code className="bg-muted overflow-x-auto rounded px-2 py-1 font-mono text-xs break-all">
+                {node.target.join(" > ")}
+              </code>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-muted-foreground text-xs font-medium">
+                {isManual ? "確認補足" : "修正方法"}
+              </span>
+              <p className="text-muted-foreground text-xs leading-relaxed whitespace-pre-line">
+                {node.failureSummary}
+              </p>
+            </div>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
 }
 
 export function ReportPageDetail({
@@ -54,10 +139,10 @@ export function ReportPageDetail({
     const seen = new Set<string>();
     for (const page of successPages) {
       const pageAnchors = new Set<string>();
-      for (const violation of page.violations) {
-        if (!seen.has(violation.id)) {
-          seen.add(violation.id);
-          pageAnchors.add(violation.id);
+      for (const issue of [...page.violations, ...page.incompletes]) {
+        if (!seen.has(issue.id)) {
+          seen.add(issue.id);
+          pageAnchors.add(issue.id);
         }
       }
       firstRuleAnchorByPage.set(page.url, pageAnchors);
@@ -67,9 +152,9 @@ export function ReportPageDetail({
   const firstPageByRule = useMemo(() => {
     const map = new Map<string, string>();
     for (const page of successPages) {
-      for (const violation of page.violations) {
-        if (!map.has(violation.id)) {
-          map.set(violation.id, page.url);
+      for (const issue of [...page.violations, ...page.incompletes]) {
+        if (!map.has(issue.id)) {
+          map.set(issue.id, page.url);
         }
       }
     }
@@ -142,93 +227,74 @@ export function ReportPageDetail({
         )}
         {successPages.length > 0 && (
           <Accordion type="multiple" value={openItems} onValueChange={setOpenItems} className="flex flex-col gap-3">
-            {successPages.map((page) => (
-              <AccordionItem
-                key={page.url}
-                value={page.url}
-                className="rounded-lg border px-4"
-              >
-                <AccordionTrigger className="hover:no-underline">
-                  <div className="flex min-w-0 flex-col gap-1 text-left">
-                    <span className="truncate text-sm font-medium">
-                      {page.url}
-                    </span>
-                    <span className="text-muted-foreground text-xs">
-                      {page.violations.length} ルール /{" "}
-                      {page.violations.reduce((s, v) => s + v.nodes.length, 0)}{" "}
-                      要素
-                    </span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent>
-                  {page.violations.length === 0 ? (
-                    <p className="text-muted-foreground py-4 text-center text-sm">
-                      このページでは違反が検出されませんでした
-                    </p>
-                  ) : (
-                    <div className="flex flex-col gap-4">
-                      {page.violations.map((v) => (
-                        <Card
-                          key={v.id}
-                          id={firstRuleAnchorByPage.get(page.url)?.has(v.id) ? `rule-${v.id}` : undefined}
-                          className="bg-muted/30 border-0 shadow-none"
-                        >
-                          <CardHeader className="p-4">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <CardTitle className="text-sm">
-                                {getAxeRuleJa(v.id)}
-                              </CardTitle>
-                              <SeverityBadge impact={v.impact} />
-                              {extractStandardTags(v.tags).map((tag) => (
-                                <Badge key={`${v.id}-${tag}`} variant="outline">
-                                  {formatStandardTag(tag)}
-                                </Badge>
-                              ))}
-                            </div>
-                            <p className="text-muted-foreground text-xs">
-                              修正方法: {getQuickFixJa(v.id, v.impact)}
-                            </p>
-                          </CardHeader>
-                          <CardContent className="flex flex-col gap-3 px-4 pt-0 pb-4">
-                            {v.nodes.map((node, nodeIdx) => (
-                              <div
-                                key={nodeIdx}
-                                className="flex flex-col gap-2 rounded-md border bg-background p-3"
-                              >
-                                <div className="flex flex-col gap-1">
-                                  <span className="text-muted-foreground text-xs font-medium">
-                                    対象要素
-                                  </span>
-                                  <code className="bg-muted overflow-x-auto rounded px-2 py-1 text-xs break-all">
-                                    {node.html}
-                                  </code>
-                                </div>
-                                <div className="flex flex-col gap-1">
-                                  <span className="text-muted-foreground text-xs font-medium">
-                                    セレクタ
-                                  </span>
-                                  <code className="bg-muted overflow-x-auto rounded px-2 py-1 font-mono text-xs break-all">
-                                    {node.target.join(" > ")}
-                                  </code>
-                                </div>
-                                <div className="flex flex-col gap-1">
-                                  <span className="text-muted-foreground text-xs font-medium">
-                                    修正方法
-                                  </span>
-                                  <p className="text-muted-foreground text-xs leading-relaxed whitespace-pre-line">
-                                    {node.failureSummary}
-                                  </p>
-                                </div>
-                              </div>
-                            ))}
-                          </CardContent>
-                        </Card>
-                      ))}
+            {successPages.map((page) => {
+              const criticalOrSeriousCount = page.violations.filter(
+                (v) => v.impact === "critical" || v.impact === "serious"
+              ).length;
+              const manualCount = page.incompletes.reduce((sum, v) => sum + v.nodes.length, 0);
+
+              return (
+                <AccordionItem
+                  key={page.url}
+                  value={page.url}
+                  className="rounded-lg border px-4"
+                >
+                  <AccordionTrigger className="hover:no-underline">
+                    <div className="flex min-w-0 flex-col gap-1 text-left">
+                      <span className="truncate text-sm font-medium">
+                        {page.url}
+                      </span>
+                      <span className="text-muted-foreground text-xs">
+                        {page.violations.length}ルール / {page.violations.reduce((s, v) => s + v.nodes.length, 0)}要素
+                        {criticalOrSeriousCount > 0 ? `（高${criticalOrSeriousCount}）` : ""}
+                      </span>
+                      <span className="text-muted-foreground text-xs">
+                        手動確認{manualCount}件 / 再テスト状態: 未再検査
+                      </span>
                     </div>
-                  )}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    {page.violations.length === 0 && page.incompletes.length === 0 ? (
+                      <p className="text-muted-foreground py-4 text-center text-sm">
+                        このページでは違反が検出されませんでした
+                      </p>
+                    ) : (
+                      <div className="flex flex-col gap-4">
+                        {page.violations.length > 0 && (
+                          <div className="flex flex-col gap-3">
+                            <p className="text-sm font-semibold">自動検出</p>
+                            {page.violations.map((v) => (
+                              <IssueCard
+                                key={`${page.url}-${v.id}-violation`}
+                                issue={v}
+                                pageUrl={page.url}
+                                attachAnchor={Boolean(firstRuleAnchorByPage.get(page.url)?.has(v.id))}
+                                isManual={false}
+                              />
+                            ))}
+                          </div>
+                        )}
+
+                        {page.incompletes.length > 0 && (
+                          <div className="flex flex-col gap-3">
+                            <p className="text-sm font-semibold">手動確認が必要</p>
+                            {page.incompletes.map((v) => (
+                              <IssueCard
+                                key={`${page.url}-${v.id}-manual`}
+                                issue={v}
+                                pageUrl={page.url}
+                                attachAnchor={Boolean(firstRuleAnchorByPage.get(page.url)?.has(v.id))}
+                                isManual
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+              );
+            })}
           </Accordion>
         )}
         <div ref={inlineBackButtonRef} className="flex justify-center pt-2">

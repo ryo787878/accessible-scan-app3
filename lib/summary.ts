@@ -1,4 +1,4 @@
-import type { Scan, ScanReportResponse, Violation } from "@/lib/types";
+import type { IncompleteCheck, Scan, ScanReportResponse, Violation } from "@/lib/types";
 import { db } from "@/lib/db";
 import { impactToJa } from "@/lib/i18n-ja";
 import { ensureDbSchema } from "@/lib/db-init";
@@ -48,22 +48,41 @@ export async function buildScanView(publicId: string): Promise<Scan | null> {
 
   if (!scan) return null;
 
-  const pages = scan.pages.map((page) => ({
-    url: page.url,
-    status: toPageStatus(page.status),
-    httpStatus: page.httpStatus,
-    errorCode: page.errorCode,
-    errorMessage: page.errorMessage,
-    violations: page.violations.map<Violation>((v) => ({
-      id: v.ruleId,
-      impact: impactToJa(v.impact),
-      description: v.description,
-      help: v.help,
-      helpUrl: v.helpUrl,
-      tags: parseJsonArray<string[]>(v.tagsJson, []),
-      nodes: parseJsonArray(v.nodesJson, []),
-    })),
-  }));
+  const pages = scan.pages.map((page) => {
+    const violations = page.violations
+      .filter((v) => v.issueType !== "incomplete")
+      .map<Violation>((v) => ({
+        id: v.ruleId,
+        impact: impactToJa(v.impact),
+        description: v.description,
+        help: v.help,
+        helpUrl: v.helpUrl,
+        tags: parseJsonArray<string[]>(v.tagsJson, []),
+        nodes: parseJsonArray(v.nodesJson, []),
+      }));
+
+    const incompletes = page.violations
+      .filter((v) => v.issueType === "incomplete")
+      .map<IncompleteCheck>((v) => ({
+        id: v.ruleId,
+        impact: impactToJa(v.impact),
+        description: v.description,
+        help: v.help,
+        helpUrl: v.helpUrl,
+        tags: parseJsonArray<string[]>(v.tagsJson, []),
+        nodes: parseJsonArray(v.nodesJson, []),
+      }));
+
+    return {
+      url: page.url,
+      status: toPageStatus(page.status),
+      httpStatus: page.httpStatus,
+      errorCode: page.errorCode,
+      errorMessage: page.errorMessage,
+      violations,
+      incompletes,
+    };
+  });
 
   const totalPages = pages.length;
   const successPages = pages.filter((p) => p.status === "success").length;
@@ -95,7 +114,10 @@ export async function buildScanReport(publicId: string): Promise<ScanReportRespo
   const scan = await buildScanView(publicId);
   if (!scan) return null;
 
-  const totalViolations = scan.pages.reduce((sum, page) => sum + page.violations.reduce((acc, v) => acc + v.nodes.length, 0), 0);
+  const totalViolations = scan.pages.reduce(
+    (sum, page) => sum + page.violations.reduce((acc, v) => acc + v.nodes.length, 0),
+    0
+  );
 
   const severityCounts = {
     critical: 0,

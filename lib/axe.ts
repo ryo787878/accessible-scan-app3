@@ -6,6 +6,15 @@ import type { Page } from "playwright";
 import { logger } from "@/lib/logger";
 
 type AxeRunResult = {
+  incomplete: Array<{
+    id: string;
+    impact?: string | null;
+    description: string;
+    help: string;
+    helpUrl: string;
+    tags?: string[];
+    nodes: Array<Record<string, unknown>>;
+  }>;
   violations: Array<{
     id: string;
     impact?: string | null;

@@ -20,6 +20,16 @@ export interface Violation {
   nodes: ViolationNode[];
 }
 
+export interface IncompleteCheck {
+  id: string;
+  impact: Impact;
+  description: string;
+  help: string;
+  helpUrl: string;
+  tags?: string[];
+  nodes: ViolationNode[];
+}
+
 export interface PageResult {
   url: string;
   status: PageStatus;
@@ -27,6 +37,7 @@ export interface PageResult {
   errorCode?: string | null;
   errorMessage?: string | null;
   violations: Violation[];
+  incompletes: IncompleteCheck[];
 }
 
 export interface Scan {

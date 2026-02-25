@@ -43,8 +43,8 @@ function sanitizeNode(raw: Record<string, unknown>): {
   return { html, target, failureSummary };
 }
 
-function sanitizeViolationsForStorage(
-  violations: Array<{
+function sanitizeAxeIssuesForStorage(
+  issues: Array<{
     id: string;
     impact?: string | null;
     description: string;
@@ -54,7 +54,7 @@ function sanitizeViolationsForStorage(
     nodes: Array<Record<string, unknown>>;
   }>
 ) {
-  return violations.slice(0, env.scanMaxViolationsPerPage).map((v) => {
+  return issues.slice(0, env.scanMaxViolationsPerPage).map((v) => {
     const sanitizedNodes = v.nodes.slice(0, env.scanMaxNodesPerViolation).map(sanitizeNode);
 
     return {
@@ -237,21 +237,37 @@ async function processScanPage(scanPageId: number, pageUrl: string): Promise<voi
       }
     }
 
-    const violations = sanitizeViolationsForStorage(axe.violations);
+    const violations = sanitizeAxeIssuesForStorage(axe.violations);
+    const incompletes = sanitizeAxeIssuesForStorage(axe.incomplete ?? []);
 
-    if (violations.length > 0) {
+    if (violations.length > 0 || incompletes.length > 0) {
       await db.axeViolation.createMany({
-        data: violations.map((v) => ({
-          scanPageId,
-          ruleId: v.id,
-          impact: v.impact ?? null,
-          description: v.description,
-          help: v.help,
-          helpUrl: v.helpUrl,
-          tagsJson: JSON.stringify(v.tags ?? []),
-          nodeCount: v.nodes.length,
-          nodesJson: JSON.stringify(v.nodes),
-        })),
+        data: [
+          ...violations.map((v) => ({
+            scanPageId,
+            issueType: "violation",
+            ruleId: v.id,
+            impact: v.impact ?? null,
+            description: v.description,
+            help: v.help,
+            helpUrl: v.helpUrl,
+            tagsJson: JSON.stringify(v.tags ?? []),
+            nodeCount: v.nodes.length,
+            nodesJson: JSON.stringify(v.nodes),
+          })),
+          ...incompletes.map((v) => ({
+            scanPageId,
+            issueType: "incomplete",
+            ruleId: v.id,
+            impact: v.impact ?? null,
+            description: v.description,
+            help: v.help,
+            helpUrl: v.helpUrl,
+            tagsJson: JSON.stringify(v.tags ?? []),
+            nodeCount: v.nodes.length,
+            nodesJson: JSON.stringify(v.nodes),
+          })),
+        ],
       });
     }
 

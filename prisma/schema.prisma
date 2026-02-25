@@ -50,6 +50,7 @@ model ScanPage {
 model AxeViolation {
   id          Int      @id @default(autoincrement())
   scanPageId  Int
+  issueType   String   @default("violation")
   ruleId      String
   impact      String?
   description String
@@ -63,6 +64,7 @@ model AxeViolation {
   scanPage ScanPage @relation(fields: [scanPageId], references: [id], onDelete: Cascade)
 
   @@index([scanPageId])
+  @@index([scanPageId, issueType])
 }
 
 model User {
