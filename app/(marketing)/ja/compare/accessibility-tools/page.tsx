@@ -7,15 +7,24 @@ import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/ca
 import { buildPageMetadata, canonicalUrl } from "@/lib/seo/metadata";
 
 const title = "アクセシビリティ チェックツール比較";
-const description = "Webアクセシビリティ チェックとWCAG チェックの観点で、導入前に確認すべき比較ポイントを整理します。";
+const description =
+  "Webアクセシビリティ チェックとウェブ アクセシビリティ 診断の観点で、導入前に確認すべき比較ポイントを整理します。";
 const canonicalPath = "/ja/compare/accessibility-tools";
 
-export const metadata: Metadata = buildPageMetadata({
-  title,
-  path: canonicalPath,
-  description,
-  ogType: "comparison",
-});
+export const metadata: Metadata = {
+  ...buildPageMetadata({
+    title,
+    path: canonicalPath,
+    description,
+    ogType: "comparison",
+  }),
+  keywords: [
+    "アクセシビリティ チェック",
+    "ウェブ アクセシビリティ 診断",
+    "アクセシビリティ診断",
+    "WCAG チェック",
+  ],
+};
 
 const faqItems = [
   {

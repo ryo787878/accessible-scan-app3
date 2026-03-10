@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, BookOpen, CircleHelp, Compass, GitCompare } from "lucide-react";
+import { ArrowRight, BookOpen, CircleHelp, ClipboardCheck, Compass, GitCompare } from "lucide-react";
 import { PageShell } from "@/components/page-shell";
 import { BreadcrumbJsonLd } from "@/components/seo/jsonld/breadcrumb";
 import { Badge } from "@/components/ui/badge";
@@ -9,17 +9,33 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { buildPageMetadata, canonicalUrl } from "@/lib/seo/metadata";
 import { SITE_DESCRIPTION } from "@/lib/seo/site";
 
-const title = "アクセシビリティ対策ガイド";
+const title = "アクセシビリティ対策ガイド | ウェブ アクセシビリティ 診断の始め方";
 const canonicalPath = "/ja";
 
-export const metadata: Metadata = buildPageMetadata({
-  title,
-  path: canonicalPath,
-  description: SITE_DESCRIPTION,
-  ogType: "lp",
-});
+export const metadata: Metadata = {
+  ...buildPageMetadata({
+    title,
+    path: canonicalPath,
+    description: SITE_DESCRIPTION,
+    ogType: "lp",
+  }),
+  keywords: [
+    "ウェブ アクセシビリティ 診断",
+    "Webアクセシビリティ チェック",
+    "アクセシビリティ診断",
+    "アクセシビリティ チェック",
+    "WCAG チェック",
+  ],
+};
 
 const guideLinks = [
+  {
+    title: "診断の全体像をつかむ",
+    description: "ウェブ アクセシビリティ 診断の対象選定から改善優先度まで、実務フローを確認できます。",
+    href: "/ja/accessibility-diagnosis",
+    icon: ClipboardCheck,
+    label: "診断ガイド",
+  },
   {
     title: "まず読む",
     description: "Webアクセシビリティ チェック実践ガイドで、改善の進め方を把握します。",
@@ -60,25 +76,26 @@ export default function JaHomePage() {
             </Badge>
             <h1 className="text-balance text-3xl font-bold tracking-tight md:text-4xl">アクセシビリティ対策ガイド</h1>
             <p className="text-muted-foreground max-w-2xl text-pretty leading-relaxed">
-              何から始めるか迷わないように、実践ガイド・比較・用語集を1ページに整理しました。まずは実践ガイドを読み、次に比較ページで要件を固める流れがおすすめです。
+              何から始めるか迷わないように、診断ガイド・実践ガイド・比較・用語集を1ページに整理しました。
+              まずは診断ガイドで全体像を把握し、次に実践ガイドと比較ページで運用要件を固める流れがおすすめです。
             </p>
             <div className="flex flex-wrap gap-3">
               <Button asChild size="lg">
-                <Link href="/ja/blog/accessibility-check-guide" scroll>
-                  実践ガイドから始める
+                <Link href="/ja/accessibility-diagnosis" scroll>
+                  診断ガイドから始める
                   <ArrowRight />
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <Link href="/ja/compare/accessibility-tools" scroll>
-                  比較ページを見る
+                <Link href="/ja/blog/accessibility-check-guide" scroll>
+                  実践ガイドから始める
                 </Link>
               </Button>
             </div>
           </div>
         </section>
 
-        <section aria-label="ガイド一覧" className="grid gap-4 md:grid-cols-3">
+        <section aria-label="ガイド一覧" className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {guideLinks.map((item) => (
             <Card key={item.href} className="bg-muted/35">
               <CardHeader className="gap-3">
@@ -114,16 +131,16 @@ export default function JaHomePage() {
             <CardContent>
               <ol className="grid gap-3 md:grid-cols-3">
                 <li className="rounded-lg border bg-muted/30 p-4 text-sm leading-relaxed">
-                  <p className="font-semibold">1. 実践ガイドを読む</p>
-                  <p className="text-muted-foreground mt-1">改善優先度の決め方を把握する</p>
+                  <p className="font-semibold">1. 診断ガイドを読む</p>
+                  <p className="text-muted-foreground mt-1">対象ページ選定と優先順位付けを把握する</p>
                 </li>
                 <li className="rounded-lg border bg-muted/30 p-4 text-sm leading-relaxed">
-                  <p className="font-semibold">2. ツールを比較する</p>
-                  <p className="text-muted-foreground mt-1">運用に必要な機能要件を整理する</p>
+                  <p className="font-semibold">2. 実践ガイドを読む</p>
+                  <p className="text-muted-foreground mt-1">修正フローと再診断の回し方を確認する</p>
                 </li>
                 <li className="rounded-lg border bg-muted/30 p-4 text-sm leading-relaxed">
-                  <p className="font-semibold">3. 用語を確認する</p>
-                  <p className="text-muted-foreground mt-1">WCAGの基礎を短時間で補完する</p>
+                  <p className="font-semibold">3. 比較と用語を確認する</p>
+                  <p className="text-muted-foreground mt-1">運用要件を固めたうえで基礎用語を補完する</p>
                 </li>
               </ol>
             </CardContent>

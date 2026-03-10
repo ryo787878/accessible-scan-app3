@@ -12,6 +12,10 @@ export function SiteFooter() {
             トップ
           </Link>
           <span aria-hidden="true">|</span>
+          <Link href="/ja" className="hover:text-foreground transition-colors">
+            日本語ガイド
+          </Link>
+          <span aria-hidden="true">|</span>
           <Link href="/terms" className="hover:text-foreground transition-colors">
             利用規約
           </Link>

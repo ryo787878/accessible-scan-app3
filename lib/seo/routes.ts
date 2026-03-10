@@ -2,7 +2,7 @@ export const blogRoutes = ["/ja/blog/accessibility-check-guide"] as const;
 export const comparisonRoutes = ["/ja/compare/accessibility-tools"] as const;
 export const glossaryRoutes = ["/ja/glossary/wcag"] as const;
 
-export const seoStaticRoutes = ["/", "/ja", "/terms", "/privacy"] as const;
+export const seoStaticRoutes = ["/", "/ja", "/ja/accessibility-diagnosis", "/terms", "/privacy"] as const;
 
 const slugUnsafeChars = /[^\p{L}\p{N}\s-]/gu;
 const slugSpaces = /\s+/g;

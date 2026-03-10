@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Shield, BarChart3, ListOrdered } from "lucide-react";
 import { ScanForm } from "@/components/scan-form";
 import { BreadcrumbJsonLd } from "@/components/seo/jsonld/breadcrumb";
 import { FaqJsonLd } from "@/components/seo/jsonld/faq";
-import { JsonLd } from "@/components/seo/json-ld";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { buildPageMetadata, canonicalUrl } from "@/lib/seo/metadata";
 import { SITE_DESCRIPTION } from "@/lib/seo/site";
@@ -23,6 +23,7 @@ export const metadata: Metadata = {
     "アクセシビリティ チェック",
     "アクセシビリティ 診断",
     "Webアクセシビリティ チェック",
+    "ウェブ アクセシビリティ 診断",
     "アクセシビリティ テスト",
     "WCAG チェック",
   ],
@@ -62,19 +63,9 @@ const faqItems = [
   },
 ];
 
-const websiteJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  name: "Accessible Scan",
-  url: canonicalUrl(canonicalPath),
-  inLanguage: "ja-JP",
-  description: SITE_DESCRIPTION,
-};
-
 export default function HomePage() {
   return (
     <main className="flex min-h-[calc(100vh-3.5rem)] flex-col items-center px-4 py-10 md:py-10">
-      <JsonLd data={websiteJsonLd} />
       <FaqJsonLd items={faqItems} />
       <BreadcrumbJsonLd items={[{ name: "ホーム", item: canonicalUrl(canonicalPath) }]} />
       <div className="flex w-full max-w-3xl flex-col gap-12">
@@ -129,6 +120,42 @@ export default function HomePage() {
               </CardHeader>
             </Card>
           ))}
+        </section>
+
+        <section aria-label="日本語ガイド" className="space-y-3">
+          <h2 className="text-xl font-semibold">日本語ガイド</h2>
+          <div className="grid gap-3 md:grid-cols-3">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">
+                  <Link href="/ja/accessibility-diagnosis" className="hover:underline">
+                    ウェブ アクセシビリティ 診断ガイド
+                  </Link>
+                </CardTitle>
+                <CardDescription>診断対象の決め方と改善優先度の付け方をまとめています。</CardDescription>
+              </CardHeader>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">
+                  <Link href="/ja/blog/accessibility-check-guide" className="hover:underline">
+                    Webアクセシビリティ チェック実践ガイド
+                  </Link>
+                </CardTitle>
+                <CardDescription>実務で再診断を回すための運用手順を確認できます。</CardDescription>
+              </CardHeader>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">
+                  <Link href="/ja/compare/accessibility-tools" className="hover:underline">
+                    アクセシビリティ チェックツール比較
+                  </Link>
+                </CardTitle>
+                <CardDescription>導入時に比較すべき軸を短時間で確認できます。</CardDescription>
+              </CardHeader>
+            </Card>
+          </div>
         </section>
 
         <footer className="text-center">
