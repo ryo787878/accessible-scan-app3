@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Shield, BarChart3, ListOrdered } from "lucide-react";
 import { CtaLink } from "@/components/cta-link";
 import { ScanForm } from "@/components/scan-form";
@@ -145,11 +144,7 @@ export default function HomePage() {
           <div className="grid gap-3 md:grid-cols-3">
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">
-                  <Link href="/ja/accessibility-diagnosis" className="hover:underline">
-                    ウェブ アクセシビリティ 診断ガイド
-                  </Link>
-                </CardTitle>
+                <CardTitle className="text-base">ウェブ アクセシビリティ 診断ガイド</CardTitle>
                 <CardDescription>診断対象の決め方と改善優先度の付け方をまとめています。</CardDescription>
               </CardHeader>
               <div className="px-6 pb-6">
@@ -160,11 +155,7 @@ export default function HomePage() {
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">
-                  <Link href="/ja/blog/accessibility-check-guide" className="hover:underline">
-                    Webアクセシビリティ チェック実践ガイド
-                  </Link>
-                </CardTitle>
+                <CardTitle className="text-base">Webアクセシビリティ チェック実践ガイド</CardTitle>
                 <CardDescription>実務で再診断を回すための運用手順を確認できます。</CardDescription>
               </CardHeader>
               <div className="px-6 pb-6">
@@ -175,11 +166,7 @@ export default function HomePage() {
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">
-                  <Link href="/ja/compare/accessibility-tools" className="hover:underline">
-                    アクセシビリティ チェックツール比較
-                  </Link>
-                </CardTitle>
+                <CardTitle className="text-base">アクセシビリティ チェックツール比較</CardTitle>
                 <CardDescription>導入時に比較すべき軸を短時間で確認できます。</CardDescription>
               </CardHeader>
               <div className="px-6 pb-6">
