@@ -22,6 +22,7 @@ export function SiteHeader() {
   const pathname = usePathname();
   const isPaid = isPaidSubscription(session?.user?.subscriptionStatus);
   const planLabel = isPaid ? "有料プラン" : "無料プラン";
+  const isHomeActive = pathname === "/";
   const isJaActive = pathname === "/ja" || pathname.startsWith("/ja/");
   const isDiagnosisActive = pathname === "/ja/accessibility-diagnosis";
   const isCompareActive = pathname.startsWith("/ja/compare");
@@ -42,6 +43,13 @@ export function SiteHeader() {
         </Link>
 
         <nav aria-label="主要ページ" className="hidden items-center gap-4 md:flex">
+          <Link
+            href="/"
+            className={`text-sm ${isHomeActive ? "text-foreground font-semibold" : "text-muted-foreground hover:text-foreground hover:underline"}`}
+            aria-current={isHomeActive ? "page" : undefined}
+          >
+            無料診断
+          </Link>
           <Link
             href="/ja"
             className={`text-sm ${isJaActive ? "text-foreground font-semibold" : "text-muted-foreground hover:text-foreground hover:underline"}`}
@@ -84,6 +92,15 @@ export function SiteHeader() {
                 <SheetDescription>主要ページへ移動できます。</SheetDescription>
               </SheetHeader>
               <nav aria-label="モバイル主要ページ" className="flex flex-col gap-2 px-4">
+                <SheetClose asChild>
+                  <Link
+                    href="/"
+                    className={`rounded-md border px-3 py-2 text-sm ${isHomeActive ? "bg-muted font-medium" : "hover:bg-muted"}`}
+                    aria-current={isHomeActive ? "page" : undefined}
+                  >
+                    無料診断
+                  </Link>
+                </SheetClose>
                 <SheetClose asChild>
                   <Link
                     href="/ja"
