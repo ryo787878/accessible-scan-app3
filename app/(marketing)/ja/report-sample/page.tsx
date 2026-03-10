@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { FileText, Gauge, Wrench } from "lucide-react";
+import { CtaLink } from "@/components/cta-link";
 import { PageIntro } from "@/components/page-intro";
 import { PageShell } from "@/components/page-shell";
 import { BreadcrumbJsonLd } from "@/components/seo/jsonld/breadcrumb";
@@ -67,9 +67,9 @@ export default function ReportSamplePage() {
             </CardDescription>
           </CardHeader>
         </Card>
-        <p className="text-sm text-muted-foreground">
-          関連: <Link href="/ja/service/accessibility-audit" className="hover:underline">診断サービス詳細</Link>
-        </p>
+        <CtaLink href="/ja/service/accessibility-audit" priority="secondary" size="sm">
+          診断サービス詳細を見る
+        </CtaLink>
       </div>
     </PageShell>
   );

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { CheckCircle2, FileText, ListChecks, ShieldCheck } from "lucide-react";
+import { CtaLink } from "@/components/cta-link";
 import { PageIntro } from "@/components/page-intro";
 import { PageShell } from "@/components/page-shell";
 import { BreadcrumbJsonLd } from "@/components/seo/jsonld/breadcrumb";
@@ -114,27 +114,36 @@ export default function AccessibilityAuditServicePage() {
         <section aria-label="関連ページ" className="grid gap-3 md:grid-cols-3">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">
-                <Link href="/ja/report-sample" className="hover:underline">診断レポート見本</Link>
-              </CardTitle>
+              <CardTitle className="text-base">診断レポート見本</CardTitle>
               <CardDescription>成果物の構成を事前に確認できます。</CardDescription>
             </CardHeader>
+            <CardContent>
+              <CtaLink href="/ja/report-sample" priority="tertiary" size="sm" showArrow className="px-0">
+                見本を見る
+              </CtaLink>
+            </CardContent>
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">
-                <Link href="/ja/cases" className="hover:underline">導入事例</Link>
-              </CardTitle>
+              <CardTitle className="text-base">導入事例</CardTitle>
               <CardDescription>業種ごとの課題整理例を確認できます。</CardDescription>
             </CardHeader>
+            <CardContent>
+              <CtaLink href="/ja/cases" priority="tertiary" size="sm" showArrow className="px-0">
+                事例を見る
+              </CtaLink>
+            </CardContent>
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">
-                <Link href="/ja/editorial-policy" className="hover:underline">監修・評価方針</Link>
-              </CardTitle>
+              <CardTitle className="text-base">監修・評価方針</CardTitle>
               <CardDescription>評価プロセスと公開ポリシーを確認できます。</CardDescription>
             </CardHeader>
+            <CardContent>
+              <CtaLink href="/ja/editorial-policy" priority="tertiary" size="sm" showArrow className="px-0">
+                方針を確認する
+              </CtaLink>
+            </CardContent>
           </Card>
         </section>
       </div>

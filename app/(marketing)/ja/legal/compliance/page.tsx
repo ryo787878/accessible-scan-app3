@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { CalendarClock, Scale, ShieldAlert } from "lucide-react";
+import { CtaLink } from "@/components/cta-link";
 import { PageIntro } from "@/components/page-intro";
 import { PageShell } from "@/components/page-shell";
 import { BreadcrumbJsonLd } from "@/components/seo/jsonld/breadcrumb";
@@ -70,9 +70,9 @@ export default function ComplianceHubPage() {
           </CardContent>
         </Card>
 
-        <p className="text-sm text-muted-foreground">
-          関連: <Link href="/ja/editorial-policy" className="hover:underline">監修・評価方針</Link>
-        </p>
+        <CtaLink href="/ja/editorial-policy" priority="secondary" size="sm">
+          監修・評価方針を見る
+        </CtaLink>
       </div>
     </PageShell>
   );

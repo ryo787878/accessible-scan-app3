@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Building2, Landmark, ShoppingCart } from "lucide-react";
+import { CtaLink } from "@/components/cta-link";
 import { PageIntro } from "@/components/page-intro";
 import { PageShell } from "@/components/page-shell";
 import { BreadcrumbJsonLd } from "@/components/seo/jsonld/breadcrumb";
@@ -65,17 +65,13 @@ export default function CaseIndexPage() {
                 <div>
                   <Badge variant="outline">{item.label}</Badge>
                 </div>
-                <CardTitle className="text-lg leading-tight">
-                  <Link href={item.href} className="hover:underline">
-                    {item.title}
-                  </Link>
-                </CardTitle>
+                <CardTitle className="text-lg leading-tight">{item.title}</CardTitle>
                 <CardDescription>{item.description}</CardDescription>
               </CardHeader>
               <CardContent>
-                <Link href={item.href} className="text-primary text-sm font-medium hover:underline">
+                <CtaLink href={item.href} priority="tertiary" size="sm" showArrow className="px-0">
                   詳細を見る
-                </Link>
+                </CtaLink>
               </CardContent>
             </Card>
           ))}

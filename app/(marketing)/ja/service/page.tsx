@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { CtaLink } from "@/components/cta-link";
 import { PageIntro } from "@/components/page-intro";
 import { PageShell } from "@/components/page-shell";
 import { BreadcrumbJsonLd } from "@/components/seo/jsonld/breadcrumb";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { jaServiceLinks } from "@/lib/content/ja-guides";
 import { createBreadcrumbData } from "@/lib/seo/breadcrumbs";
 import { buildPageMetadata } from "@/lib/seo/metadata";
@@ -29,13 +29,14 @@ export default function JaServiceIndexPage() {
           {jaServiceLinks.map((entry) => (
             <Card key={entry.href}>
               <CardHeader>
-                <CardTitle className="text-lg">
-                  <Link href={entry.href} className="hover:underline">
-                    {entry.title}
-                  </Link>
-                </CardTitle>
+                <CardTitle className="text-lg">{entry.title}</CardTitle>
                 <CardDescription>{entry.description}</CardDescription>
               </CardHeader>
+              <CardContent>
+                <CtaLink href={entry.href} priority="tertiary" size="sm" showArrow className="px-0">
+                  サービスを見る
+                </CtaLink>
+              </CardContent>
             </Card>
           ))}
         </section>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { CheckCircle2, ClipboardCheck, FileBarChart2, Gauge } from "lucide-react";
+import { CtaLink } from "@/components/cta-link";
 import { PageShell } from "@/components/page-shell";
 import { BreadcrumbJsonLd } from "@/components/seo/jsonld/breadcrumb";
 import { FaqJsonLd } from "@/components/seo/jsonld/faq";
@@ -123,33 +123,36 @@ export default function AccessibilityDiagnosisPage() {
           <div className="grid gap-3 md:grid-cols-3">
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">
-                  <Link href="/ja/blog/accessibility-check-guide" className="hover:underline">
-                    Webアクセシビリティ チェック実践ガイド
-                  </Link>
-                </CardTitle>
+                <CardTitle className="text-base">Webアクセシビリティ チェック実践ガイド</CardTitle>
                 <CardDescription>診断結果を運用に落とし込む手順を確認できます。</CardDescription>
               </CardHeader>
+              <CardContent>
+                <CtaLink href="/ja/blog/accessibility-check-guide" priority="tertiary" size="sm" showArrow className="px-0">
+                  記事を読む
+                </CtaLink>
+              </CardContent>
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">
-                  <Link href="/ja/compare/accessibility-tools" className="hover:underline">
-                    アクセシビリティ チェックツール比較
-                  </Link>
-                </CardTitle>
+                <CardTitle className="text-base">アクセシビリティ チェックツール比較</CardTitle>
                 <CardDescription>導入前に見落としやすい比較ポイントを整理できます。</CardDescription>
               </CardHeader>
+              <CardContent>
+                <CtaLink href="/ja/compare/accessibility-tools" priority="tertiary" size="sm" showArrow className="px-0">
+                  比較を見る
+                </CtaLink>
+              </CardContent>
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">
-                  <Link href="/ja/glossary/wcag" className="hover:underline">
-                    WCAGとは？
-                  </Link>
-                </CardTitle>
+                <CardTitle className="text-base">WCAGとは？</CardTitle>
                 <CardDescription>基礎用語を短時間で確認できます。</CardDescription>
               </CardHeader>
+              <CardContent>
+                <CtaLink href="/ja/glossary/wcag" priority="tertiary" size="sm" showArrow className="px-0">
+                  用語を確認する
+                </CtaLink>
+              </CardContent>
             </Card>
           </div>
         </section>

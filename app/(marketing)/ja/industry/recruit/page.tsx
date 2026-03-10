@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { CtaLink } from "@/components/cta-link";
 import { PageIntro } from "@/components/page-intro";
 import { PageShell } from "@/components/page-shell";
 import { BreadcrumbJsonLd } from "@/components/seo/jsonld/breadcrumb";
@@ -35,7 +35,9 @@ export default function RecruitIndustryPage() {
             </ul>
           </CardContent>
         </Card>
-        <p className="text-sm text-muted-foreground">関連: <Link href="/ja/cases/recruit-site" className="hover:underline">採用事例</Link></p>
+        <CtaLink href="/ja/cases/recruit-site" priority="secondary" size="sm">
+          採用事例を見る
+        </CtaLink>
       </div>
     </PageShell>
   );

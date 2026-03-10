@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { CtaLink } from "@/components/cta-link";
 import { PageIntro } from "@/components/page-intro";
 import { PageShell } from "@/components/page-shell";
 import { BreadcrumbJsonLd } from "@/components/seo/jsonld/breadcrumb";
@@ -64,9 +64,9 @@ export default function PublicSectorCasePage() {
             </CardContent>
           </Card>
         ))}
-        <p className="text-sm text-muted-foreground">
-          関連: <Link href="/ja/legal/compliance" className="hover:underline">法令対応ハブ</Link>
-        </p>
+        <CtaLink href="/ja/legal/compliance" priority="secondary" size="sm">
+          法令対応ハブを見る
+        </CtaLink>
       </div>
     </PageShell>
   );
