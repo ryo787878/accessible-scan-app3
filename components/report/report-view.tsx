@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { Loader2, XCircle, ExternalLink, ArrowLeft } from "lucide-react";
+import { Loader2, XCircle, ExternalLink } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+import { CtaLink } from "@/components/cta-link";
 import { ReportSummary } from "@/components/report/report-summary";
 import { ReportTopIssues } from "@/components/report/report-top-issues";
 import { ReportRuleTable } from "@/components/report/report-rule-table";
@@ -206,12 +207,9 @@ export function ReportView({ publicId }: ReportViewProps) {
 
       {/* Back action */}
       <div className="mt-4 flex flex-col items-center gap-4 border-t pt-8 md:mt-6">
-        <Button asChild variant="outline" size="lg">
-          <Link href="/" scroll>
-            <ArrowLeft aria-hidden="true" />
-            新しい診断を開始
-          </Link>
-        </Button>
+        <CtaLink href="/" priority="secondary" size="lg">
+          新しい診断を開始
+        </CtaLink>
       </div>
     </div>
   );

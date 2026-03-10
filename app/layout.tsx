@@ -76,6 +76,12 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body className="font-sans antialiased">
+        <a
+          href="#main-content"
+          className="bg-background text-foreground focus:ring-ring sr-only focus:not-sr-only fixed top-3 left-3 z-[100] rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
+        >
+          メインコンテンツへスキップ
+        </a>
         {gaId ? (
           <>
             <Script src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} strategy="afterInteractive" />

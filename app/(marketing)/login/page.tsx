@@ -10,7 +10,7 @@ export default async function LoginPage({
   const callbackUrl = sanitizeCallbackUrl(params.callbackUrl);
 
   return (
-    <main className="mx-auto flex min-h-[calc(100vh-3.5rem)] w-full max-w-3xl flex-col justify-center px-4 py-10">
+    <main id="main-content" className="mx-auto flex min-h-[calc(100vh-3.5rem)] w-full max-w-3xl flex-col justify-center px-4 py-10">
       <LoginPanel callbackUrl={callbackUrl} />
     </main>
   );

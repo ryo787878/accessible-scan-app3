@@ -53,7 +53,7 @@ export default async function ReportPage({
   ]);
 
   return (
-    <main className="flex min-h-screen flex-col items-center px-4 py-12 md:py-5">
+    <main id="main-content" className="flex min-h-screen flex-col items-center px-4 py-12 md:py-5">
       <BreadcrumbJsonLd items={breadcrumb.jsonLdItems} />
       <div className="flex w-full max-w-4xl flex-col gap-6">
         <PageBreadcrumbs items={breadcrumb.pageItems} />

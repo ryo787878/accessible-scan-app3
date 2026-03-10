@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import {
-  ArrowRight,
   BookOpen,
   BriefcaseBusiness,
   CircleHelp,
@@ -14,10 +12,10 @@ import {
   Store,
   Wrench,
 } from "lucide-react";
+import { CtaLink } from "@/components/cta-link";
 import { PageShell } from "@/components/page-shell";
 import { BreadcrumbJsonLd } from "@/components/seo/jsonld/breadcrumb";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { buildPageMetadata, canonicalUrl } from "@/lib/seo/metadata";
 import { SITE_DESCRIPTION } from "@/lib/seo/site";
@@ -144,17 +142,12 @@ export default function JaHomePage() {
               まずは下の3つから、今の目的に最も近い入口を選んでください。
             </p>
             <div className="flex flex-wrap gap-3">
-              <Button asChild size="lg">
-                <Link href="/ja/accessibility-diagnosis" scroll>
-                  3分で診断を始める
-                  <ArrowRight />
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline">
-                <Link href="/ja/compare/accessibility-tools" scroll>
-                  導入比較を確認する
-                </Link>
-              </Button>
+              <CtaLink href="/ja/accessibility-diagnosis" priority="primary" size="lg" showArrow>
+                3分で診断を始める
+              </CtaLink>
+              <CtaLink href="/ja/compare/accessibility-tools" priority="secondary" size="lg">
+                導入比較を確認する
+              </CtaLink>
             </div>
           </div>
         </section>
@@ -176,12 +169,14 @@ export default function JaHomePage() {
                   <CardDescription className="leading-relaxed">{item.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button asChild variant={index === 0 ? "default" : "outline"} className="w-full">
-                    <Link href={item.href} scroll>
-                      {item.cta}
-                      <ArrowRight />
-                    </Link>
-                  </Button>
+                  <CtaLink
+                    href={item.href}
+                    priority={index === 0 ? "primary" : "secondary"}
+                    fullWidth
+                    showArrow
+                  >
+                    {item.cta}
+                  </CtaLink>
                 </CardContent>
               </Card>
             ))}
@@ -232,12 +227,9 @@ export default function JaHomePage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <Button asChild variant="ghost" className="px-0">
-                    <Link href={item.href} scroll>
-                      ページへ移動
-                      <ArrowRight />
-                    </Link>
-                  </Button>
+                  <CtaLink href={item.href} priority="tertiary" showArrow className="px-0">
+                    ページへ移動
+                  </CtaLink>
                 </CardContent>
               </Card>
             ))}
@@ -259,12 +251,9 @@ export default function JaHomePage() {
                 <CardDescription>診断範囲、成果物、進め方を1ページで確認できます。</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button asChild variant="ghost" className="px-0">
-                  <Link href="/ja/service/accessibility-audit" scroll>
-                    詳細を見る
-                    <ArrowRight />
-                  </Link>
-                </Button>
+                <CtaLink href="/ja/service/accessibility-audit" priority="tertiary" showArrow className="px-0">
+                  詳細を見る
+                </CtaLink>
               </CardContent>
             </Card>
             <Card className="bg-muted/30">
@@ -276,12 +265,9 @@ export default function JaHomePage() {
                 <CardDescription>レポートの粒度と確認ポイントを事前に把握できます。</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button asChild variant="ghost" className="px-0">
-                  <Link href="/ja/report-sample" scroll>
-                    見本を見る
-                    <ArrowRight />
-                  </Link>
-                </Button>
+                <CtaLink href="/ja/report-sample" priority="tertiary" showArrow className="px-0">
+                  見本を見る
+                </CtaLink>
               </CardContent>
             </Card>
           </div>
@@ -303,11 +289,9 @@ export default function JaHomePage() {
                   <CardDescription>{item.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button asChild variant="outline" size="sm">
-                    <Link href={item.href} scroll>
-                      ページへ移動
-                    </Link>
-                  </Button>
+                  <CtaLink href={item.href} priority="secondary" size="sm">
+                    ページへ移動
+                  </CtaLink>
                 </CardContent>
               </Card>
             ))}

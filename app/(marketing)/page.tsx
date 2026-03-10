@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Shield, BarChart3, ListOrdered } from "lucide-react";
+import { CtaLink } from "@/components/cta-link";
 import { ScanForm } from "@/components/scan-form";
 import { BreadcrumbJsonLd } from "@/components/seo/jsonld/breadcrumb";
 import { FaqJsonLd } from "@/components/seo/jsonld/faq";
@@ -66,7 +67,7 @@ const faqItems = [
 
 export default function HomePage() {
   return (
-    <main className="flex min-h-[calc(100vh-3.5rem)] flex-col items-center px-4 py-10 md:py-10">
+    <main id="main-content" className="flex min-h-[calc(100vh-3.5rem)] flex-col items-center px-4 py-10 md:py-10">
       <SoftwareApplicationJsonLd />
       <FaqJsonLd items={faqItems} />
       <BreadcrumbJsonLd items={[{ name: "ホーム", item: canonicalUrl(canonicalPath) }]} />
@@ -136,6 +137,11 @@ export default function HomePage() {
                 </CardTitle>
                 <CardDescription>診断対象の決め方と改善優先度の付け方をまとめています。</CardDescription>
               </CardHeader>
+              <div className="px-6 pb-6">
+                <CtaLink href="/ja/accessibility-diagnosis" priority="secondary" size="sm" showArrow>
+                  記事を読む
+                </CtaLink>
+              </div>
             </Card>
             <Card>
               <CardHeader>
@@ -146,6 +152,11 @@ export default function HomePage() {
                 </CardTitle>
                 <CardDescription>実務で再診断を回すための運用手順を確認できます。</CardDescription>
               </CardHeader>
+              <div className="px-6 pb-6">
+                <CtaLink href="/ja/blog/accessibility-check-guide" priority="secondary" size="sm" showArrow>
+                  記事を読む
+                </CtaLink>
+              </div>
             </Card>
             <Card>
               <CardHeader>
@@ -156,6 +167,11 @@ export default function HomePage() {
                 </CardTitle>
                 <CardDescription>導入時に比較すべき軸を短時間で確認できます。</CardDescription>
               </CardHeader>
+              <div className="px-6 pb-6">
+                <CtaLink href="/ja/compare/accessibility-tools" priority="secondary" size="sm" showArrow>
+                  記事を読む
+                </CtaLink>
+              </div>
             </Card>
           </div>
         </section>

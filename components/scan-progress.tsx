@@ -7,10 +7,10 @@ import {
   XCircle,
   Loader2,
   Clock,
-  ArrowRight,
   ExternalLink,
   AlertTriangle,
 } from "lucide-react";
+import { CtaLink } from "@/components/cta-link";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import {
@@ -244,12 +244,9 @@ export function ScanProgress({ publicId }: { publicId: string }) {
 
       {/* Action button */}
       {isCompleted && (
-        <Button asChild size="lg" className="w-full text-base">
-          <Link href={`/report/${publicId}`} scroll>
-            レポートを見る
-            <ArrowRight aria-hidden="true" />
-          </Link>
-        </Button>
+        <CtaLink href={`/report/${publicId}`} priority="primary" size="lg" fullWidth showArrow className="text-base">
+          レポートを見る
+        </CtaLink>
       )}
 
       {isFailed && (
@@ -257,12 +254,9 @@ export function ScanProgress({ publicId }: { publicId: string }) {
           <p className="text-muted-foreground text-center text-sm">
             一部のページで診断に失敗しました。完了した結果をレポートで確認できます。
           </p>
-          <Button asChild size="lg" variant="outline" className="w-full text-base">
-            <Link href={`/report/${publicId}`} scroll>
-              レポートを見る
-              <ArrowRight aria-hidden="true" />
-            </Link>
-          </Button>
+          <CtaLink href={`/report/${publicId}`} priority="secondary" size="lg" fullWidth showArrow className="text-base">
+            レポートを見る
+          </CtaLink>
         </div>
       )}
     </div>

@@ -14,7 +14,7 @@ type PageShellProps = {
 
 export function PageShell({ children, maxWidth = "4xl", className }: PageShellProps) {
   return (
-    <main className={cn("flex min-h-[calc(100vh-3.5rem)] justify-center px-4 py-10", className)}>
+    <main id="main-content" className={cn("flex min-h-[calc(100vh-3.5rem)] justify-center px-4 py-10", className)}>
       <div className={cn("w-full", maxWidthClass[maxWidth])}>{children}</div>
     </main>
   );
