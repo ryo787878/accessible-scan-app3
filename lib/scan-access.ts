@@ -8,10 +8,21 @@ export async function resolveScanAccess(publicId: string, viewerUserId: string |
     return "invalid";
   }
 
-  const scan = await db.scan.findUnique({
+  const scanModel = db.scan as {
+    findUnique?: (args: { where: { publicId: string }; select: { userId: true } }) => Promise<{ userId: string | null } | null>;
+    findFirst?: (args: { where: { publicId: string }; select: { userId: true } }) => Promise<{ userId: string | null } | null>;
+  };
+
+  const query = {
     where: { publicId },
-    select: { userId: true },
-  });
+    select: { userId: true as const },
+  };
+
+  const scan = scanModel.findUnique
+    ? await scanModel.findUnique(query)
+    : scanModel.findFirst
+      ? await scanModel.findFirst(query)
+      : null;
 
   if (!scan) {
     return "not_found";
