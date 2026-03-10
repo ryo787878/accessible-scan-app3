@@ -1,6 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, BookOpen, CircleHelp, ClipboardCheck, Compass, GitCompare } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpen,
+  BriefcaseBusiness,
+  CircleHelp,
+  ClipboardCheck,
+  Compass,
+  FileText,
+  GitCompare,
+  Landmark,
+  ShieldCheck,
+  Store,
+} from "lucide-react";
 import { PageShell } from "@/components/page-shell";
 import { BreadcrumbJsonLd } from "@/components/seo/jsonld/breadcrumb";
 import { Badge } from "@/components/ui/badge";
@@ -56,6 +68,51 @@ const guideLinks = [
     href: "/ja/glossary/wcag",
     icon: CircleHelp,
     label: "用語集",
+  },
+];
+
+const solutionLinks = [
+  {
+    title: "診断サービス詳細",
+    description: "診断範囲、成果物、進め方を1ページで確認できます。",
+    href: "/ja/service/accessibility-audit",
+    icon: ShieldCheck,
+    label: "サービス",
+  },
+  {
+    title: "診断レポート見本",
+    description: "どの粒度で結果が整理されるかを事前に確認できます。",
+    href: "/ja/report-sample",
+    icon: FileText,
+    label: "成果物",
+  },
+  {
+    title: "法令対応ハブ（2026）",
+    description: "法令対応の実務チェックポイントを整理しています。",
+    href: "/ja/legal/compliance-2026",
+    icon: Landmark,
+    label: "法令対応",
+  },
+];
+
+const industryLinks = [
+  {
+    title: "EC向けガイド",
+    description: "購入導線とフォームを優先した診断観点をまとめています。",
+    href: "/ja/industry/ecommerce",
+    icon: Store,
+  },
+  {
+    title: "公共向けガイド",
+    description: "情報探索と申請導線の改善観点を整理しています。",
+    href: "/ja/industry/public-sector",
+    icon: Landmark,
+  },
+  {
+    title: "採用向けガイド",
+    description: "募集要項と応募フォームの改善観点を整理しています。",
+    href: "/ja/industry/recruit",
+    icon: BriefcaseBusiness,
   },
 ];
 
@@ -118,6 +175,85 @@ export default function JaHomePage() {
               </CardContent>
             </Card>
           ))}
+        </section>
+
+        <section aria-label="導入検討" className="space-y-4">
+          <div className="space-y-1">
+            <h2 className="text-2xl font-semibold tracking-tight">導入検討向け</h2>
+            <p className="text-muted-foreground text-sm">サービス比較や導入前の確認に使えるページです。</p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {solutionLinks.map((item) => (
+              <Card key={item.href} className="bg-muted/30">
+                <CardHeader className="gap-3">
+                  <div className="bg-background text-primary flex size-10 items-center justify-center rounded-lg border">
+                    <item.icon className="size-5" />
+                  </div>
+                  <div className="space-y-2">
+                    <Badge variant="outline">{item.label}</Badge>
+                    <CardTitle className="text-lg leading-tight">{item.title}</CardTitle>
+                    <CardDescription className="leading-relaxed">{item.description}</CardDescription>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Button asChild variant="ghost" className="px-0">
+                    <Link href={item.href} scroll>
+                      詳細を見る
+                      <ArrowRight />
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        <section aria-label="業種別ガイド" className="space-y-4">
+          <div className="space-y-1">
+            <h2 className="text-2xl font-semibold tracking-tight">業種別ガイド</h2>
+            <p className="text-muted-foreground text-sm">業種ごとに優先して診断すべき観点を整理しています。</p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {industryLinks.map((item) => (
+              <Card key={item.href}>
+                <CardHeader>
+                  <CardTitle className="inline-flex items-center gap-2 text-lg">
+                    <item.icon className="size-5 text-primary" />
+                    {item.title}
+                  </CardTitle>
+                  <CardDescription>{item.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button asChild variant="outline" size="sm">
+                    <Link href={item.href} scroll>
+                      ページへ移動
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        <section aria-label="実務運用" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl">実務運用と品質管理</CardTitle>
+              <CardDescription>導入後の改善運用に必要なページです。</CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-wrap gap-3">
+              <Button asChild variant="outline">
+                <Link href="/ja/cases" scroll>
+                  導入事例を見る
+                </Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link href="/ja/editorial-policy" scroll>
+                  監修・評価方針を見る
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
         </section>
 
         <section aria-label="利用の流れ">

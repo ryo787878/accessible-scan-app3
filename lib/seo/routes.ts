@@ -1,6 +1,16 @@
 export const blogRoutes = ["/ja/blog/accessibility-check-guide"] as const;
 export const comparisonRoutes = ["/ja/compare/accessibility-tools"] as const;
 export const glossaryRoutes = ["/ja/glossary/wcag"] as const;
+export const serviceRoutes = ["/ja/service/accessibility-audit", "/ja/report-sample"] as const;
+export const legalRoutes = ["/ja/legal/compliance-2026"] as const;
+export const trustRoutes = ["/ja/editorial-policy"] as const;
+export const caseRoutes = [
+  "/ja/cases",
+  "/ja/cases/ecommerce-platform",
+  "/ja/cases/public-sector-portal",
+  "/ja/cases/recruit-site",
+] as const;
+export const industryRoutes = ["/ja/industry/ecommerce", "/ja/industry/public-sector", "/ja/industry/recruit"] as const;
 
 export const seoStaticRoutes = ["/", "/ja", "/ja/accessibility-diagnosis", "/terms", "/privacy"] as const;
 
