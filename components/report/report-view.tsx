@@ -194,12 +194,12 @@ export function ReportView({ publicId }: ReportViewProps) {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-3 sm:flex-row">
-              <Button asChild className="sm:flex-1">
-                <Link href={`/login?callbackUrl=/report/${publicId}`}>ログイン</Link>
-              </Button>
-              <Button asChild variant="outline" className="sm:flex-1">
-                <Link href={`/login?callbackUrl=/report/${publicId}`}>会員登録</Link>
-              </Button>
+              <CtaLink href={`/login?callbackUrl=/report/${publicId}`} priority="primary" fullWidth className="sm:flex-1">
+                ログインして詳細を見る
+              </CtaLink>
+              <CtaLink href="/ja/accessibility-diagnosis" priority="secondary" fullWidth className="sm:flex-1">
+                診断ガイドを見る
+              </CtaLink>
             </CardContent>
           </Card>
         </section>
