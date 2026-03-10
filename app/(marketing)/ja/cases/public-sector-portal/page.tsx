@@ -65,7 +65,7 @@ export default function PublicSectorCasePage() {
           </Card>
         ))}
         <p className="text-sm text-muted-foreground">
-          関連: <Link href="/ja/legal/compliance-2026" className="hover:underline">2026年の法令対応ハブ</Link>
+          関連: <Link href="/ja/legal/compliance" className="hover:underline">法令対応ハブ</Link>
         </p>
       </div>
     </PageShell>

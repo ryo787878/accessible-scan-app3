@@ -4,6 +4,7 @@ import { Shield, BarChart3, ListOrdered } from "lucide-react";
 import { ScanForm } from "@/components/scan-form";
 import { BreadcrumbJsonLd } from "@/components/seo/jsonld/breadcrumb";
 import { FaqJsonLd } from "@/components/seo/jsonld/faq";
+import { SoftwareApplicationJsonLd } from "@/components/seo/jsonld/software-application";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { buildPageMetadata, canonicalUrl } from "@/lib/seo/metadata";
 import { SITE_DESCRIPTION } from "@/lib/seo/site";
@@ -66,6 +67,7 @@ const faqItems = [
 export default function HomePage() {
   return (
     <main className="flex min-h-[calc(100vh-3.5rem)] flex-col items-center px-4 py-10 md:py-10">
+      <SoftwareApplicationJsonLd />
       <FaqJsonLd items={faqItems} />
       <BreadcrumbJsonLd items={[{ name: "ホーム", item: canonicalUrl(canonicalPath) }]} />
       <div className="flex w-full max-w-3xl flex-col gap-12">

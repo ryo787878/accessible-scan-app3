@@ -18,3 +18,8 @@ export const sanitizeCallbackUrl = (callbackUrl: string | undefined): string => 
     return "/";
   }
 };
+
+export const buildLoginRedirectPath = (callbackUrl: string | undefined): string => {
+  const safePath = sanitizeCallbackUrl(callbackUrl);
+  return `/login?callbackUrl=${encodeURIComponent(safePath)}`;
+};

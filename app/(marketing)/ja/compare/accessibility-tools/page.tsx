@@ -49,7 +49,8 @@ export default function CompareAccessibilityToolsPage() {
         items={[
           { name: "ホーム", item: canonicalUrl("/") },
           { name: "日本語ガイド", item: canonicalUrl("/ja") },
-          { name: "比較", item: canonicalUrl(canonicalPath) },
+          { name: "比較", item: canonicalUrl("/ja/compare") },
+          { name: title, item: canonicalUrl(canonicalPath) },
         ]}
       />
       <div className="flex flex-col gap-6">

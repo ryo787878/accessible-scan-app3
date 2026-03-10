@@ -60,7 +60,7 @@ export default function EditorialPolicyPage() {
           ))}
         </section>
         <p className="text-sm text-muted-foreground">
-          関連: <Link href="/ja/legal/compliance-2026" className="hover:underline">法令対応ハブ（2026）</Link>
+          関連: <Link href="/ja/legal/compliance" className="hover:underline">法令対応ハブ</Link>
         </p>
       </div>
     </PageShell>

@@ -19,7 +19,8 @@ export default function PublicIndustryPage() {
         items={[
           { name: "ホーム", item: canonicalUrl("/") },
           { name: "日本語ガイド", item: canonicalUrl("/ja") },
-          { name: "業種別", item: canonicalUrl(canonicalPath) },
+          { name: "業種別", item: canonicalUrl("/ja/industry") },
+          { name: title, item: canonicalUrl(canonicalPath) },
         ]}
       />
       <div className="flex flex-col gap-6">

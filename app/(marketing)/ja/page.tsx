@@ -87,9 +87,9 @@ const solutionLinks = [
     label: "成果物",
   },
   {
-    title: "法令対応ハブ（2026）",
+    title: "法令対応ハブ",
     description: "法令対応の実務チェックポイントを整理しています。",
-    href: "/ja/legal/compliance-2026",
+    href: "/ja/legal/compliance",
     icon: Landmark,
     label: "法令対応",
   },

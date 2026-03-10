@@ -22,7 +22,8 @@ export default function WcagGlossaryPage() {
         items={[
           { name: "ホーム", item: canonicalUrl("/") },
           { name: "日本語ガイド", item: canonicalUrl("/ja") },
-          { name: "用語集", item: canonicalUrl(canonicalPath) },
+          { name: "用語集", item: canonicalUrl("/ja/glossary") },
+          { name: title, item: canonicalUrl(canonicalPath) },
         ]}
       />
       <article className="prose prose-neutral dark:prose-invert max-w-none">

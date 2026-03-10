@@ -42,7 +42,8 @@ export default function AccessibilityCheckGuidePage() {
         items={[
           { name: "ホーム", item: canonicalUrl("/") },
           { name: "日本語ガイド", item: canonicalUrl("/ja") },
-          { name: "ブログ", item: canonicalUrl(canonicalPath) },
+          { name: "ブログ", item: canonicalUrl("/ja/blog") },
+          { name: title, item: canonicalUrl(canonicalPath) },
         ]}
       />
       <article className="prose prose-neutral dark:prose-invert max-w-none">

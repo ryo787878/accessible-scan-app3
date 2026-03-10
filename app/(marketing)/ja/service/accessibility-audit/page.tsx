@@ -40,7 +40,8 @@ export default function AccessibilityAuditServicePage() {
         items={[
           { name: "ホーム", item: canonicalUrl("/") },
           { name: "日本語ガイド", item: canonicalUrl("/ja") },
-          { name: "サービス", item: canonicalUrl(canonicalPath) },
+          { name: "サービス", item: canonicalUrl("/ja/service") },
+          { name: title, item: canonicalUrl(canonicalPath) },
         ]}
       />
 
