@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 
 const mockCreate = vi.fn();
 const mockFindMany = vi.fn();
+const mockFindUnique = vi.fn();
 const mockScanUpdate = vi.fn();
 const mockScanPageUpdateMany = vi.fn();
 const mockEnqueue = vi.fn();
@@ -16,6 +17,7 @@ vi.mock("@/lib/db", () => ({
     scan: {
       create: mockCreate,
       findMany: mockFindMany,
+      findUnique: mockFindUnique,
       update: mockScanUpdate,
     },
     scanPage: {
@@ -51,6 +53,7 @@ describe("scan api routes", () => {
     mockAuth.mockResolvedValue(undefined);
     mockEnqueue.mockReturnValue({ accepted: true });
     mockFindMany.mockResolvedValue([]);
+    mockFindUnique.mockResolvedValue({ userId: null });
     mockScanUpdate.mockResolvedValue(undefined);
     mockScanPageUpdateMany.mockResolvedValue({ count: 0 });
   });
