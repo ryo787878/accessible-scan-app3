@@ -50,87 +50,138 @@ function renderRuleTable(
   }
 
   return (
-    <div className="rounded-xl border p-2">
-      <Table className="table-fixed">
-        <TableHeader>
-          <TableRow className="hover:bg-transparent">
-            <TableHead className="h-12 px-4">ルール</TableHead>
-            <TableHead className="h-12 w-20 px-2 text-center md:w-24 md:px-4">重大度</TableHead>
-            <TableHead className="h-12 w-20 px-2 text-right md:w-24 md:px-4">ページ数</TableHead>
-            <TableHead className="h-12 w-20 px-2 text-right md:w-24 md:px-4">要素数</TableHead>
-            <TableHead className="h-12 w-36 px-2 md:w-44 md:px-4">判定種別</TableHead>
-            <TableHead className="h-12 w-44 px-2 md:w-56 md:px-4">再発しやすさ</TableHead>
-            <TableHead className="h-12 w-24 px-2 md:w-28 md:px-4">対応状況</TableHead>
-          </TableRow>
-        </TableHeader>
+    <>
+      <div className="flex flex-col gap-3 md:hidden">
+        {filtered.map((rule) => {
+          const localized = getAxeRuleJa(rule.ruleId);
+          const shouldShowRuleId = localized !== rule.ruleId;
 
-        <TableBody>
-          {filtered.map((rule) => {
-            const localized = getAxeRuleJa(rule.ruleId);
-            const shouldShowRuleId = localized !== rule.ruleId;
+          return (
+            <div key={`mobile-${decisionType}-${rule.ruleId}`} className="rounded-lg border p-3">
+              <div className="flex items-start justify-between gap-2">
+                <p className="text-sm font-semibold leading-6">{localized}</p>
+                <SeverityBadge impact={rule.impact} />
+              </div>
+              {shouldShowRuleId && (
+                <p className="text-muted-foreground mt-1 font-mono text-xs break-all">{rule.ruleId}</p>
+              )}
+              <p className="text-muted-foreground mt-2 text-xs leading-5">
+                どう直すか: {getQuickFixJa(rule.ruleId, rule.impact)}
+              </p>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                <Badge variant={decisionType === "自動検出" ? "secondary" : "outline"}>{decisionType}</Badge>
+                <Badge variant="outline">ページ {rule.pageCount}</Badge>
+                <Badge variant="outline">要素 {rule.nodeCount}</Badge>
+                <Badge variant="outline">未対応</Badge>
+              </div>
+              {rule.standardTags.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {rule.standardTags.map((tag) => (
+                    <Badge key={`${rule.ruleId}-${tag}`} variant="outline" className="text-[10px]">
+                      {formatStandardTag(tag)}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+              <div className="mt-2 rounded-md bg-muted/50 p-2 text-xs">
+                <p className="font-medium">{rule.recurrenceLabel}</p>
+                <p className="text-muted-foreground mt-1 leading-5">{rule.recurrenceReason}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => onRequestDetail?.(rule.ruleId)}
+                className="text-primary mt-2 rounded border px-2 py-1 text-xs hover:bg-muted"
+                aria-label={`${localized} の詳細を開く`}
+              >
+                詳細を見る
+              </button>
+            </div>
+          );
+        })}
+      </div>
 
-            return (
-              <TableRow key={`${decisionType}-${rule.ruleId}`}>
-                <TableCell className="min-w-0 px-3 py-4 align-top whitespace-normal md:px-4">
-                  <div className="flex flex-col gap-1.5">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[15px] leading-6 font-medium">{localized}</span>
-                      <button
-                        type="button"
-                        onClick={() => onRequestDetail?.(rule.ruleId)}
-                        className="text-primary rounded border px-2 py-0.5 text-xs hover:bg-muted"
-                        aria-label={`${localized} の詳細を開く`}
-                      >
-                        詳細
-                      </button>
-                    </div>
+      <div className="hidden rounded-xl border p-2 md:block">
+        <Table className="table-fixed">
+          <TableHeader>
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="h-12 px-4">ルール</TableHead>
+              <TableHead className="h-12 w-20 px-2 text-center md:w-24 md:px-4">重大度</TableHead>
+              <TableHead className="h-12 w-20 px-2 text-right md:w-24 md:px-4">ページ数</TableHead>
+              <TableHead className="h-12 w-20 px-2 text-right md:w-24 md:px-4">要素数</TableHead>
+              <TableHead className="h-12 w-36 px-2 md:w-44 md:px-4">判定種別</TableHead>
+              <TableHead className="h-12 w-44 px-2 md:w-56 md:px-4">再発しやすさ</TableHead>
+              <TableHead className="h-12 w-24 px-2 md:w-28 md:px-4">対応状況</TableHead>
+            </TableRow>
+          </TableHeader>
 
-                    {shouldShowRuleId && (
-                      <span className="text-muted-foreground font-mono text-xs break-all">{rule.ruleId}</span>
-                    )}
+          <TableBody>
+            {filtered.map((rule) => {
+              const localized = getAxeRuleJa(rule.ruleId);
+              const shouldShowRuleId = localized !== rule.ruleId;
 
-                    <span className="text-muted-foreground text-xs leading-5 break-words">
-                      どう直すか: {getQuickFixJa(rule.ruleId, rule.impact)}
-                    </span>
-
-                    {rule.standardTags.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        {rule.standardTags.map((tag) => (
-                          <Badge key={`${rule.ruleId}-${tag}`} variant="outline" className="text-[10px]">
-                            {formatStandardTag(tag)}
-                          </Badge>
-                        ))}
+              return (
+                <TableRow key={`${decisionType}-${rule.ruleId}`}>
+                  <TableCell className="min-w-0 px-3 py-4 align-top whitespace-normal md:px-4">
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[15px] leading-6 font-medium">{localized}</span>
+                        <button
+                          type="button"
+                          onClick={() => onRequestDetail?.(rule.ruleId)}
+                          className="text-primary rounded border px-2 py-0.5 text-xs hover:bg-muted"
+                          aria-label={`${localized} の詳細を開く`}
+                        >
+                          詳細
+                        </button>
                       </div>
-                    )}
-                  </div>
-                </TableCell>
 
-                <TableCell className="px-2 py-4 text-center align-top md:px-4">
-                  <SeverityBadge impact={rule.impact} />
-                </TableCell>
+                      {shouldShowRuleId && (
+                        <span className="text-muted-foreground font-mono text-xs break-all">{rule.ruleId}</span>
+                      )}
 
-                <TableCell className="px-2 py-4 text-right font-mono align-top md:px-4">{rule.pageCount}</TableCell>
+                      <span className="text-muted-foreground text-xs leading-5 break-words">
+                        どう直すか: {getQuickFixJa(rule.ruleId, rule.impact)}
+                      </span>
 
-                <TableCell className="px-2 py-4 text-right font-mono align-top md:px-4">{rule.nodeCount}</TableCell>
+                      {rule.standardTags.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {rule.standardTags.map((tag) => (
+                            <Badge key={`${rule.ruleId}-${tag}`} variant="outline" className="text-[10px]">
+                              {formatStandardTag(tag)}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </TableCell>
 
-                <TableCell className="px-2 py-4 align-top md:px-4">
-                  <Badge variant={decisionType === "自動検出" ? "secondary" : "outline"}>{decisionType}</Badge>
-                </TableCell>
+                  <TableCell className="px-2 py-4 text-center align-top md:px-4">
+                    <SeverityBadge impact={rule.impact} />
+                  </TableCell>
 
-                <TableCell className="px-2 py-4 align-top text-xs leading-5 md:px-4">
-                  <p className="text-foreground font-medium">{rule.recurrenceLabel}</p>
-                  <p className="text-muted-foreground">{rule.recurrenceReason}</p>
-                </TableCell>
+                  <TableCell className="px-2 py-4 text-right font-mono align-top md:px-4">{rule.pageCount}</TableCell>
 
-                <TableCell className="px-2 py-4 align-top md:px-4">
-                  <Badge variant="outline">未対応</Badge>
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </div>
+                  <TableCell className="px-2 py-4 text-right font-mono align-top md:px-4">{rule.nodeCount}</TableCell>
+
+                  <TableCell className="px-2 py-4 align-top md:px-4">
+                    <Badge variant={decisionType === "自動検出" ? "secondary" : "outline"}>{decisionType}</Badge>
+                  </TableCell>
+
+                  <TableCell className="px-2 py-4 align-top text-xs leading-5 md:px-4">
+                    <p className="text-foreground font-medium">{rule.recurrenceLabel}</p>
+                    <p className="text-muted-foreground">{rule.recurrenceReason}</p>
+                  </TableCell>
+
+                  <TableCell className="px-2 py-4 align-top md:px-4">
+                    <Badge variant="outline">未対応</Badge>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </div>
+    </>
   );
 }
 

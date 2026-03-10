@@ -6,12 +6,13 @@ import {
   BriefcaseBusiness,
   CircleHelp,
   ClipboardCheck,
-  Compass,
   FileText,
   GitCompare,
   Landmark,
+  Rocket,
   ShieldCheck,
   Store,
+  Wrench,
 } from "lucide-react";
 import { PageShell } from "@/components/page-shell";
 import { BreadcrumbJsonLd } from "@/components/seo/jsonld/breadcrumb";
@@ -40,55 +41,61 @@ export const metadata: Metadata = {
   ],
 };
 
-const guideLinks = [
+const personaLinks = [
   {
-    title: "診断の全体像をつかむ",
-    description: "ウェブ アクセシビリティ 診断の対象選定から改善優先度まで、実務フローを確認できます。",
+    title: "まず診断を始めたい",
+    description: "対象選定から改善優先度まで、最初に必要な流れを短時間で把握します。",
     href: "/ja/accessibility-diagnosis",
-    icon: ClipboardCheck,
-    label: "診断ガイド",
+    cta: "診断ガイドへ",
+    icon: Rocket,
+    tone: "bg-primary text-primary-foreground",
+    badge: "初回向け",
   },
   {
-    title: "まず読む",
-    description: "Webアクセシビリティ チェック実践ガイドで、改善の進め方を把握します。",
+    title: "導入可否を比較したい",
+    description: "評価軸を整理して、運用に合うツールとサービス要件を明確化します。",
+    href: "/ja/compare/accessibility-tools",
+    cta: "比較ページへ",
+    icon: GitCompare,
+    tone: "bg-muted/40",
+    badge: "導入検討",
+  },
+  {
+    title: "実装と運用を改善したい",
+    description: "修正フロー、再診断、法令対応まで実務の運用ルールを固めます。",
+    href: "/ja/service/accessibility-audit",
+    cta: "サービス詳細へ",
+    icon: Wrench,
+    tone: "bg-muted/40",
+    badge: "実装担当",
+  },
+] as const;
+
+const guideLinks = [
+  {
+    title: "Webアクセシビリティ チェック実践ガイド",
+    description: "改善の進め方と再診断運用を解説した記事です。",
     href: "/ja/blog/accessibility-check-guide",
     icon: BookOpen,
     label: "解説記事",
   },
   {
-    title: "次に比較する",
-    description: "主要な比較軸を確認し、自社運用に合うツール要件を整理します。",
-    href: "/ja/compare/accessibility-tools",
-    icon: GitCompare,
-    label: "比較ページ",
-  },
-  {
-    title: "用語を確認する",
-    description: "WCAGの基本概念や達成基準を短時間で確認できます。",
+    title: "WCAGとは？",
+    description: "基礎用語と達成基準を短時間で確認できます。",
     href: "/ja/glossary/wcag",
     icon: CircleHelp,
     label: "用語集",
   },
-];
-
-const solutionLinks = [
   {
-    title: "診断サービス詳細",
-    description: "診断範囲、成果物、進め方を1ページで確認できます。",
-    href: "/ja/service/accessibility-audit",
-    icon: ShieldCheck,
-    label: "サービス",
-  },
-  {
-    title: "診断レポート見本",
-    description: "どの粒度で結果が整理されるかを事前に確認できます。",
-    href: "/ja/report-sample",
-    icon: FileText,
-    label: "成果物",
+    title: "監修・評価方針",
+    description: "品質確認プロセスと更新方針を確認できます。",
+    href: "/ja/editorial-policy",
+    icon: ClipboardCheck,
+    label: "品質管理",
   },
   {
     title: "法令対応ハブ",
-    description: "法令対応の実務チェックポイントを整理しています。",
+    description: "法令対応で見落としやすい実務論点を整理しています。",
     href: "/ja/legal/compliance",
     icon: Landmark,
     label: "法令対応",
@@ -133,58 +140,87 @@ export default function JaHomePage() {
             </Badge>
             <h1 className="text-balance text-3xl font-bold tracking-tight md:text-4xl">アクセシビリティ対策ガイド</h1>
             <p className="text-muted-foreground max-w-2xl text-pretty leading-relaxed">
-              何から始めるか迷わないように、診断ガイド・実践ガイド・比較・用語集を1ページに整理しました。
-              まずは診断ガイドで全体像を把握し、次に実践ガイドと比較ページで運用要件を固める流れがおすすめです。
+              目的別に迷わず進めるために、診断開始、比較検討、運用改善の導線を分けて整理しました。
+              まずは下の3つから、今の目的に最も近い入口を選んでください。
             </p>
             <div className="flex flex-wrap gap-3">
               <Button asChild size="lg">
                 <Link href="/ja/accessibility-diagnosis" scroll>
-                  診断ガイドから始める
+                  3分で診断を始める
                   <ArrowRight />
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <Link href="/ja/blog/accessibility-check-guide" scroll>
-                  実践ガイドから始める
+                <Link href="/ja/compare/accessibility-tools" scroll>
+                  導入比較を確認する
                 </Link>
               </Button>
             </div>
           </div>
         </section>
 
-        <section aria-label="ガイド一覧" className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {guideLinks.map((item) => (
-            <Card key={item.href} className="bg-muted/35">
-              <CardHeader className="gap-3">
-                <div className="bg-background text-primary flex size-10 items-center justify-center rounded-lg border">
-                  <item.icon className="size-5" />
-                </div>
-                <div className="space-y-2">
-                  <Badge variant="outline">{item.label}</Badge>
-                  <CardTitle className="text-xl leading-tight">{item.title}</CardTitle>
-                  <CardDescription className="leading-relaxed">{item.description}</CardDescription>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Button asChild variant="ghost" className="px-0">
-                  <Link href={item.href} scroll>
-                    読む
-                    <ArrowRight />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </section>
-
-        <section aria-label="導入検討" className="space-y-4">
+        <section aria-label="目的別の入口" className="space-y-4">
           <div className="space-y-1">
-            <h2 className="text-2xl font-semibold tracking-tight">導入検討向け</h2>
-            <p className="text-muted-foreground text-sm">サービス比較や導入前の確認に使えるページです。</p>
+            <h2 className="text-2xl font-semibold tracking-tight">目的別に進む</h2>
+            <p className="text-muted-foreground text-sm">今の状況に近いカードを選ぶと、必要なページへ最短で移動できます。</p>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
-            {solutionLinks.map((item) => (
-              <Card key={item.href} className="bg-muted/30">
+            {personaLinks.map((item, index) => (
+              <Card key={item.href} className={index === 0 ? "border-primary border-2" : ""}>
+                <CardHeader className="gap-3">
+                  <div className={`flex size-10 items-center justify-center rounded-lg border ${item.tone}`}>
+                    <item.icon className="size-5" aria-hidden="true" />
+                  </div>
+                  <Badge variant="outline" className="w-fit">{item.badge}</Badge>
+                  <CardTitle className="text-xl leading-tight">{item.title}</CardTitle>
+                  <CardDescription className="leading-relaxed">{item.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button asChild variant={index === 0 ? "default" : "outline"} className="w-full">
+                    <Link href={item.href} scroll>
+                      {item.cta}
+                      <ArrowRight />
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        <section aria-label="最短ステップ">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl">最短3ステップ</CardTitle>
+              <CardDescription>初回導入時に迷いづらい推奨順です。</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ol className="grid gap-3 md:grid-cols-3">
+                <li className="rounded-lg border bg-muted/30 p-4 text-sm leading-relaxed">
+                  <p className="font-semibold">1. 診断を開始する</p>
+                  <p className="text-muted-foreground mt-1">対象ページ選定と優先順位付けを確認する</p>
+                </li>
+                <li className="rounded-lg border bg-muted/30 p-4 text-sm leading-relaxed">
+                  <p className="font-semibold">2. 比較軸を固める</p>
+                  <p className="text-muted-foreground mt-1">レポート品質と運用性で導入可否を判断する</p>
+                </li>
+                <li className="rounded-lg border bg-muted/30 p-4 text-sm leading-relaxed">
+                  <p className="font-semibold">3. 運用ルールを決める</p>
+                  <p className="text-muted-foreground mt-1">再診断と品質管理の更新フローを定義する</p>
+                </li>
+              </ol>
+            </CardContent>
+          </Card>
+        </section>
+
+        <section aria-label="ガイド一覧" className="space-y-4">
+          <div className="space-y-1">
+            <h2 className="text-2xl font-semibold tracking-tight">関連ガイド</h2>
+            <p className="text-muted-foreground text-sm">必要な情報だけを短時間で拾えるように分類しています。</p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {guideLinks.map((item) => (
+              <Card key={item.href} className="bg-muted/35">
                 <CardHeader className="gap-3">
                   <div className="bg-background text-primary flex size-10 items-center justify-center rounded-lg border">
                     <item.icon className="size-5" />
@@ -198,13 +234,56 @@ export default function JaHomePage() {
                 <CardContent>
                   <Button asChild variant="ghost" className="px-0">
                     <Link href={item.href} scroll>
-                      詳細を見る
+                      ページへ移動
                       <ArrowRight />
                     </Link>
                   </Button>
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </section>
+
+        <section aria-label="導入検討" className="space-y-4">
+          <div className="space-y-1">
+            <h2 className="text-2xl font-semibold tracking-tight">導入検討向け</h2>
+            <p className="text-muted-foreground text-sm">サービス比較や成果物の確認に使えるページです。</p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card className="bg-muted/30">
+              <CardHeader className="gap-3">
+                <div className="bg-background text-primary flex size-10 items-center justify-center rounded-lg border">
+                  <ShieldCheck className="size-5" />
+                </div>
+                <CardTitle className="text-lg leading-tight">診断サービス詳細</CardTitle>
+                <CardDescription>診断範囲、成果物、進め方を1ページで確認できます。</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button asChild variant="ghost" className="px-0">
+                  <Link href="/ja/service/accessibility-audit" scroll>
+                    詳細を見る
+                    <ArrowRight />
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+            <Card className="bg-muted/30">
+              <CardHeader className="gap-3">
+                <div className="bg-background text-primary flex size-10 items-center justify-center rounded-lg border">
+                  <FileText className="size-5" />
+                </div>
+                <CardTitle className="text-lg leading-tight">診断レポート見本</CardTitle>
+                <CardDescription>レポートの粒度と確認ポイントを事前に把握できます。</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button asChild variant="ghost" className="px-0">
+                  <Link href="/ja/report-sample" scroll>
+                    見本を見る
+                    <ArrowRight />
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </section>
 
@@ -233,54 +312,6 @@ export default function JaHomePage() {
               </Card>
             ))}
           </div>
-        </section>
-
-        <section aria-label="実務運用" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl">実務運用と品質管理</CardTitle>
-              <CardDescription>導入後の改善運用に必要なページです。</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-wrap gap-3">
-              <Button asChild variant="outline">
-                <Link href="/ja/cases" scroll>
-                  導入事例を見る
-                </Link>
-              </Button>
-              <Button asChild variant="outline">
-                <Link href="/ja/editorial-policy" scroll>
-                  監修・評価方針を見る
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </section>
-
-        <section aria-label="利用の流れ">
-          <Card>
-            <CardHeader>
-              <CardTitle className="inline-flex items-center gap-2 text-xl">
-                <Compass className="size-5" />
-                迷ったときの進め方
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ol className="grid gap-3 md:grid-cols-3">
-                <li className="rounded-lg border bg-muted/30 p-4 text-sm leading-relaxed">
-                  <p className="font-semibold">1. 診断ガイドを読む</p>
-                  <p className="text-muted-foreground mt-1">対象ページ選定と優先順位付けを把握する</p>
-                </li>
-                <li className="rounded-lg border bg-muted/30 p-4 text-sm leading-relaxed">
-                  <p className="font-semibold">2. 実践ガイドを読む</p>
-                  <p className="text-muted-foreground mt-1">修正フローと再診断の回し方を確認する</p>
-                </li>
-                <li className="rounded-lg border bg-muted/30 p-4 text-sm leading-relaxed">
-                  <p className="font-semibold">3. 比較と用語を確認する</p>
-                  <p className="text-muted-foreground mt-1">運用要件を固めたうえで基礎用語を補完する</p>
-                </li>
-              </ol>
-            </CardContent>
-          </Card>
         </section>
       </div>
     </PageShell>

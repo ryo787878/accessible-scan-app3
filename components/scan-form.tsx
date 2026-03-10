@@ -24,14 +24,16 @@ export function ScanForm() {
   const [maxPages, setMaxPages] = useState(10);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [urlError, setUrlError] = useState<string | null>(null);
-  const [agreementError, setAgreementError] = useState<string | null>(null);
+  const [authorizationError, setAuthorizationError] = useState<string | null>(null);
+  const [termsError, setTermsError] = useState<string | null>(null);
   const [hasAuthorization, setHasAuthorization] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setUrlError(null);
-    setAgreementError(null);
+    setAuthorizationError(null);
+    setTermsError(null);
 
     // クライアントサイドバリデーション
     const trimmedUrl = url.trim();
@@ -55,8 +57,16 @@ export function ScanForm() {
       return;
     }
 
-    if (!hasAuthorization || !acceptedTerms) {
-      setAgreementError("権限確認と規約同意の両方が必要です");
+    let hasAgreementIssue = false;
+    if (!hasAuthorization) {
+      setAuthorizationError("診断権限の確認が必要です");
+      hasAgreementIssue = true;
+    }
+    if (!acceptedTerms) {
+      setTermsError("利用規約とプライバシーポリシーへの同意が必要です");
+      hasAgreementIssue = true;
+    }
+    if (hasAgreementIssue) {
       return;
     }
 
@@ -166,10 +176,11 @@ export function ScanForm() {
                 checked={hasAuthorization}
                 onCheckedChange={(checked) => {
                   setHasAuthorization(checked === true);
-                  if (agreementError) setAgreementError(null);
+                  if (authorizationError) setAuthorizationError(null);
                 }}
                 disabled={isSubmitting}
-                aria-describedby="authorization-help"
+                aria-invalid={!!authorizationError}
+                aria-describedby={authorizationError ? "authorization-help authorization-error" : "authorization-help"}
               />
               <div className="space-y-1">
                 <Label htmlFor="has-authorization" className="cursor-pointer leading-relaxed">
@@ -178,6 +189,11 @@ export function ScanForm() {
                 <p id="authorization-help" className="text-muted-foreground text-xs">
                   第三者サイトの無断診断や、ログイン突破などの回避行為は禁止です。
                 </p>
+                {authorizationError && (
+                  <p id="authorization-error" className="text-destructive text-sm" role="alert">
+                    {authorizationError}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -187,10 +203,11 @@ export function ScanForm() {
                 checked={acceptedTerms}
                 onCheckedChange={(checked) => {
                   setAcceptedTerms(checked === true);
-                  if (agreementError) setAgreementError(null);
+                  if (termsError) setTermsError(null);
                 }}
                 disabled={isSubmitting}
-                aria-describedby="terms-help"
+                aria-invalid={!!termsError}
+                aria-describedby={termsError ? "terms-help terms-error" : "terms-help"}
               />
               <Label htmlFor="accept-terms" id="terms-help" className="cursor-pointer leading-relaxed">
                 <Link href="/terms" className="text-primary hover:underline">
@@ -202,13 +219,12 @@ export function ScanForm() {
                 </Link>
                 に同意します
               </Label>
+              {termsError && (
+                <p id="terms-error" className="text-destructive text-sm" role="alert">
+                  {termsError}
+                </p>
+              )}
             </div>
-
-            {agreementError && (
-              <p className="text-destructive text-sm" role="alert">
-                {agreementError}
-              </p>
-            )}
           </div>
 
           <Button
