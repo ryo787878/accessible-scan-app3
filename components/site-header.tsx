@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, Shield } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -18,8 +19,12 @@ import { isPaidSubscription } from "@/lib/subscription";
 
 export function SiteHeader() {
   const { data: session, status } = useSession();
+  const pathname = usePathname();
   const isPaid = isPaidSubscription(session?.user?.subscriptionStatus);
   const planLabel = isPaid ? "有料プラン" : "無料プラン";
+  const isJaActive = pathname === "/ja" || pathname.startsWith("/ja/");
+  const isDiagnosisActive = pathname === "/ja/accessibility-diagnosis";
+  const isCompareActive = pathname.startsWith("/ja/compare");
 
   return (
     <header className="bg-background/80 sticky top-0 z-50 w-full border-b backdrop-blur-sm">
@@ -37,13 +42,25 @@ export function SiteHeader() {
         </Link>
 
         <nav aria-label="主要ページ" className="hidden items-center gap-4 md:flex">
-          <Link href="/ja" className="text-sm hover:underline">
+          <Link
+            href="/ja"
+            className={`text-sm ${isJaActive ? "text-foreground font-semibold" : "text-muted-foreground hover:text-foreground hover:underline"}`}
+            aria-current={isJaActive ? "page" : undefined}
+          >
             日本語ガイド
           </Link>
-          <Link href="/ja/accessibility-diagnosis" className="text-sm hover:underline">
+          <Link
+            href="/ja/accessibility-diagnosis"
+            className={`text-sm ${isDiagnosisActive ? "text-foreground font-semibold" : "text-muted-foreground hover:text-foreground hover:underline"}`}
+            aria-current={isDiagnosisActive ? "page" : undefined}
+          >
             診断ガイド
           </Link>
-          <Link href="/ja/compare/accessibility-tools" className="text-sm hover:underline">
+          <Link
+            href="/ja/compare/accessibility-tools"
+            className={`text-sm ${isCompareActive ? "text-foreground font-semibold" : "text-muted-foreground hover:text-foreground hover:underline"}`}
+            aria-current={isCompareActive ? "page" : undefined}
+          >
             ツール比較
           </Link>
         </nav>
@@ -68,14 +85,19 @@ export function SiteHeader() {
               </SheetHeader>
               <nav aria-label="モバイル主要ページ" className="flex flex-col gap-2 px-4">
                 <SheetClose asChild>
-                  <Link href="/ja" className="rounded-md border px-3 py-2 text-sm hover:bg-muted">
+                  <Link
+                    href="/ja"
+                    className={`rounded-md border px-3 py-2 text-sm ${isJaActive ? "bg-muted font-medium" : "hover:bg-muted"}`}
+                    aria-current={isJaActive ? "page" : undefined}
+                  >
                     日本語ガイド
                   </Link>
                 </SheetClose>
                 <SheetClose asChild>
                   <Link
                     href="/ja/accessibility-diagnosis"
-                    className="rounded-md border px-3 py-2 text-sm hover:bg-muted"
+                    className={`rounded-md border px-3 py-2 text-sm ${isDiagnosisActive ? "bg-muted font-medium" : "hover:bg-muted"}`}
+                    aria-current={isDiagnosisActive ? "page" : undefined}
                   >
                     診断ガイド
                   </Link>
@@ -83,7 +105,8 @@ export function SiteHeader() {
                 <SheetClose asChild>
                   <Link
                     href="/ja/compare/accessibility-tools"
-                    className="rounded-md border px-3 py-2 text-sm hover:bg-muted"
+                    className={`rounded-md border px-3 py-2 text-sm ${isCompareActive ? "bg-muted font-medium" : "hover:bg-muted"}`}
+                    aria-current={isCompareActive ? "page" : undefined}
                   >
                     ツール比較
                   </Link>

@@ -6,6 +6,7 @@ import { ScanForm } from "@/components/scan-form";
 import { BreadcrumbJsonLd } from "@/components/seo/jsonld/breadcrumb";
 import { FaqJsonLd } from "@/components/seo/jsonld/faq";
 import { SoftwareApplicationJsonLd } from "@/components/seo/jsonld/software-application";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { buildPageMetadata, canonicalUrl } from "@/lib/seo/metadata";
 import { SITE_DESCRIPTION } from "@/lib/seo/site";
@@ -115,14 +116,28 @@ export default function HomePage() {
 
         <section aria-label="よくある質問" className="space-y-3">
           <h2 className="text-xl font-semibold">よくある質問</h2>
-          {faqItems.map((item) => (
-            <Card key={item.q}>
-              <CardHeader>
-                <CardTitle className="text-base">{item.q}</CardTitle>
-                <CardDescription className="text-sm leading-relaxed text-foreground/80">{item.a}</CardDescription>
-              </CardHeader>
-            </Card>
-          ))}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">よくある質問一覧</CardTitle>
+              <CardDescription>質問を選択すると回答が表示されます。</CardDescription>
+            </CardHeader>
+            <div className="px-6 pb-4">
+              <Accordion type="single" collapsible className="w-full">
+                {faqItems.map((item, index) => (
+                  <AccordionItem
+                    key={item.q}
+                    value={`faq-${index}`}
+                    className="border-b last:border-b-0"
+                  >
+                    <AccordionTrigger className="text-sm leading-relaxed">{item.q}</AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground text-sm leading-relaxed">
+                      {item.a}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </div>
+          </Card>
         </section>
 
         <section aria-label="日本語ガイド" className="space-y-3">
