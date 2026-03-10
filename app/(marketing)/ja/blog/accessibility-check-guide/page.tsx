@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { CtaLink } from "@/components/cta-link";
 import { MarkdownDocLayout } from "@/components/markdown-doc-layout";
 import { ArticleJsonLd } from "@/components/seo/jsonld/article";
 import { BreadcrumbJsonLd } from "@/components/seo/jsonld/breadcrumb";
@@ -46,6 +47,14 @@ export default function AccessibilityCheckGuidePage() {
           { name: title, item: canonicalUrl(canonicalPath) },
         ]}
       />
+      <section aria-label="記事アクション" className="mb-6 flex flex-wrap gap-3">
+        <CtaLink href="/" priority="primary" showArrow>
+          無料診断を開始する
+        </CtaLink>
+        <CtaLink href="/ja/accessibility-diagnosis" priority="secondary">
+          診断フローを確認する
+        </CtaLink>
+      </section>
       <article className="prose prose-neutral dark:prose-invert max-w-none">
         <p>
           アクセシビリティ テストでは、まずテンプレート単位で代表ページを選定し、重大度の高い課題から修正します。
@@ -63,6 +72,14 @@ export default function AccessibilityCheckGuidePage() {
           もあわせて確認してください。
         </p>
       </article>
+      <section aria-label="関連ページ" className="mt-8 flex flex-wrap gap-3 border-t pt-6">
+        <CtaLink href="/ja/compare/accessibility-tools" priority="secondary" size="sm">
+          ツール比較を見る
+        </CtaLink>
+        <CtaLink href="/ja/service/accessibility-audit" priority="secondary" size="sm">
+          診断サービス詳細を見る
+        </CtaLink>
+      </section>
     </MarkdownDocLayout>
   );
 }

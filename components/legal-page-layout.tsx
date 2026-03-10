@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { CtaLink } from "@/components/cta-link";
 import { MarkdownDocLayout } from "@/components/markdown-doc-layout";
 
 export type LegalSection = {
@@ -24,6 +25,16 @@ export function LegalPageLayout({ title, updatedAt, summary, sections }: LegalPa
           </section>
         ))}
       </div>
+      <section aria-label="関連導線" className="mt-8 border-t pt-6">
+        <div className="flex flex-wrap gap-3">
+          <CtaLink href="/" priority="primary" showArrow>
+            無料診断を開始する
+          </CtaLink>
+          <CtaLink href="/ja" priority="secondary">
+            日本語ガイドへ戻る
+          </CtaLink>
+        </div>
+      </section>
     </MarkdownDocLayout>
   );
 }
