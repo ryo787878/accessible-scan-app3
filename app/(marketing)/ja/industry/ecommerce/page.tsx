@@ -24,7 +24,7 @@ export default function EcommerceIndustryPage() {
         ]}
       />
       <div className="flex flex-col gap-6">
-        <PageIntro title={title} description={description} />
+        <PageIntro title={title} description={description} variant="article" />
         <Card>
           <CardHeader><CardTitle>優先観点</CardTitle></CardHeader>
           <CardContent>

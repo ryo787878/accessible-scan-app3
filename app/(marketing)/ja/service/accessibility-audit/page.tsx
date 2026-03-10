@@ -46,7 +46,7 @@ export default function AccessibilityAuditServicePage() {
       />
 
       <div className="flex flex-col gap-6">
-        <PageIntro title={title} description={description} meta="公開情報: 2026-03-10時点" />
+        <PageIntro title={title} description={description} variant="article" meta="公開情報: 2026-03-10時点" />
 
         <section className="grid gap-4 md:grid-cols-3" aria-label="サービスの要点">
           <Card className="bg-muted/35">

@@ -34,7 +34,7 @@ export default function ComplianceHubPage() {
     <PageShell maxWidth="4xl">
       <BreadcrumbJsonLd items={breadcrumb.jsonLdItems} />
       <div className="flex flex-col gap-6">
-        <PageIntro title={title} description={description} meta="注意: 本ページは一般的な実務整理であり、法的助言そのものではありません。" />
+        <PageIntro title={title} description={description} variant="article" meta="注意: 本ページは一般的な実務整理であり、法的助言そのものではありません。" />
 
         <section className="grid gap-4 md:grid-cols-3" aria-label="確認ポイント">
           <Card className="bg-muted/35">

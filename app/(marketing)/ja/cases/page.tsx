@@ -53,7 +53,7 @@ export default function CaseIndexPage() {
       />
 
       <div className="flex flex-col gap-6">
-        <PageIntro title={title} description={description} meta="注記: 実在案件の秘匿情報を除いて再構成した公開テンプレートです。" />
+        <PageIntro title={title} description={description} variant="index" meta="注記: 実在案件の秘匿情報を除いて再構成した公開テンプレートです。" />
 
         <section className="grid gap-4 md:grid-cols-3" aria-label="事例一覧">
           {caseLinks.map((item) => (

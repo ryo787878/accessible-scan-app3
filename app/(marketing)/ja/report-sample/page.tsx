@@ -45,7 +45,7 @@ export default function ReportSamplePage() {
         ]}
       />
       <div className="flex flex-col gap-6">
-        <PageIntro title={title} description={description} />
+        <PageIntro title={title} description={description} variant="article" />
         <section className="grid gap-4 md:grid-cols-3" aria-label="レポート構成">
           {sections.map((section) => (
             <Card key={section.title} className="bg-muted/35">

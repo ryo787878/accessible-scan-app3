@@ -24,7 +24,7 @@ export default function JaServiceIndexPage() {
     <PageShell maxWidth="4xl">
       <BreadcrumbJsonLd items={breadcrumb.jsonLdItems} />
       <div className="flex flex-col gap-6">
-        <PageIntro title={title} description={description} />
+        <PageIntro title={title} description={description} variant="index" />
         <section className="grid gap-4 md:grid-cols-2">
           {jaServiceLinks.map((entry) => (
             <Card key={entry.href}>

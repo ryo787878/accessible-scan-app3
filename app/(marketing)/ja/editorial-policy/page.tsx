@@ -45,7 +45,7 @@ export default function EditorialPolicyPage() {
         ]}
       />
       <div className="flex flex-col gap-6">
-        <PageIntro title={title} description={description} meta="最終更新日: 2026-03-10" />
+        <PageIntro title={title} description={description} variant="article" meta="最終更新日: 2026-03-10" />
         <section className="grid gap-4 md:grid-cols-3" aria-label="方針">
           {items.map((item) => (
             <Card key={item.title} className="bg-muted/35">

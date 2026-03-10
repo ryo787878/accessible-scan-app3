@@ -49,7 +49,7 @@ export default function PublicSectorCasePage() {
         ]}
       />
       <div className="flex flex-col gap-6">
-        <PageIntro title={title} description={description} meta="公開テンプレート（実案件の固有情報は含みません）" />
+        <PageIntro title={title} description={description} variant="article" meta="公開テンプレート（実案件の固有情報は含みません）" />
         {sections.map((section) => (
           <Card key={section.title}>
             <CardHeader>
