@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CtaLink } from "@/components/cta-link";
 import { PageIntro } from "@/components/page-intro";
 import { PageShell } from "@/components/page-shell";
 import { BreadcrumbJsonLd } from "@/components/seo/jsonld/breadcrumb";
@@ -55,6 +56,14 @@ export default function CompareAccessibilityToolsPage() {
       />
       <div className="flex flex-col gap-6">
         <PageIntro title="アクセシビリティ チェックツール比較" description="導入時の比較軸をまとめたページです。" variant="article" />
+        <section aria-label="比較後のアクション" className="flex flex-wrap gap-3">
+          <CtaLink href="/" priority="primary" size="lg" showArrow>
+            無料診断を試す
+          </CtaLink>
+          <CtaLink href="/ja/accessibility-diagnosis" priority="secondary" size="lg">
+            診断フローを確認する
+          </CtaLink>
+        </section>
         <div className="grid gap-4 md:grid-cols-3">
           <Card className="bg-muted/40 border-0">
             <CardHeader>

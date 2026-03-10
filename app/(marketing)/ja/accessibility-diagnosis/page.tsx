@@ -83,6 +83,14 @@ export default function AccessibilityDiagnosisPage() {
             このページは、アクセシビリティ チェックを運用に定着させたいチーム向けに、診断の進め方を実務ベースで整理しています。
             まずは自動診断で全体像を可視化し、次に再発しやすいパターンから改修する流れが効果的です。
           </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <CtaLink href="/" priority="primary" showArrow>
+              無料診断を開始する
+            </CtaLink>
+            <CtaLink href="/ja/service/accessibility-audit" priority="secondary">
+              診断サービス詳細を見る
+            </CtaLink>
+          </div>
         </section>
 
         <section aria-label="診断ステップ" className="grid gap-4 md:grid-cols-3">

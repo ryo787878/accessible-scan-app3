@@ -47,6 +47,14 @@ export default function AccessibilityAuditServicePage() {
 
       <div className="flex flex-col gap-6">
         <PageIntro title={title} description={description} variant="article" meta="公開情報: 2026-03-10時点" />
+        <section aria-label="サービス導線" className="flex flex-wrap gap-3">
+          <CtaLink href="/" priority="primary" showArrow>
+            無料診断を試す
+          </CtaLink>
+          <CtaLink href="/ja/report-sample" priority="secondary">
+            レポート見本を確認する
+          </CtaLink>
+        </section>
 
         <section className="grid gap-4 md:grid-cols-3" aria-label="サービスの要点">
           <Card className="bg-muted/35">
