@@ -149,9 +149,24 @@ export function ScanForm() {
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <Label htmlFor="max-pages">診断ページ数</Label>
-              <span className="text-muted-foreground text-sm font-mono">
-                {maxPages} ページ
-              </span>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="max-pages-input"
+                  type="number"
+                  min={1}
+                  max={20}
+                  value={maxPages}
+                  onChange={(e) => {
+                    const raw = Number(e.target.value);
+                    if (Number.isNaN(raw)) return;
+                    setMaxPages(Math.max(1, Math.min(20, raw)));
+                  }}
+                  disabled={isSubmitting}
+                  className="h-8 w-20 text-right font-mono"
+                  aria-label="診断ページ数を数値入力"
+                />
+                <span className="text-muted-foreground text-sm font-mono">ページ</span>
+              </div>
             </div>
             <Slider
               id="max-pages"
