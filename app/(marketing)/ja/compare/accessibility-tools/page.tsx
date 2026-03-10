@@ -4,6 +4,7 @@ import { PageIntro } from "@/components/page-intro";
 import { PageShell } from "@/components/page-shell";
 import { BreadcrumbJsonLd } from "@/components/seo/jsonld/breadcrumb";
 import { FaqJsonLd } from "@/components/seo/jsonld/faq";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { buildPageMetadata, canonicalUrl } from "@/lib/seo/metadata";
 
@@ -86,14 +87,24 @@ export default function CompareAccessibilityToolsPage() {
         </div>
         <section className="space-y-3" aria-label="比較FAQ">
           <h2 className="text-xl font-semibold">FAQ</h2>
-          {faqItems.map((item) => (
-            <Card key={item.q}>
-              <CardHeader>
-                <CardTitle className="text-base">{item.q}</CardTitle>
-                <CardDescription className="text-foreground/80">{item.a}</CardDescription>
-              </CardHeader>
-            </Card>
-          ))}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">比較FAQ一覧</CardTitle>
+              <CardDescription>質問を展開して回答を確認できます。</CardDescription>
+            </CardHeader>
+            <div className="px-6 pb-4">
+              <Accordion type="single" collapsible className="w-full">
+                {faqItems.map((item, index) => (
+                  <AccordionItem key={item.q} value={`faq-${index}`} className="border-b last:border-b-0">
+                    <AccordionTrigger className="text-sm leading-relaxed">{item.q}</AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground text-sm leading-relaxed">
+                      {item.a}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </div>
+          </Card>
         </section>
       </div>
     </PageShell>

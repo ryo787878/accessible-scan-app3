@@ -209,9 +209,14 @@ export function ReportView({ publicId }: ReportViewProps) {
 
       {/* Back action */}
       <div className="mt-4 flex flex-col items-center gap-4 border-t pt-8 md:mt-6">
-        <CtaLink href="/" priority="secondary" size="lg">
-          新しい診断を開始
-        </CtaLink>
+        <div className="grid w-full max-w-xl gap-2 sm:grid-cols-2">
+          <CtaLink href="/" priority="secondary" size="lg" fullWidth>
+            新しい診断を開始
+          </CtaLink>
+          <CtaLink href="/ja/accessibility-diagnosis" priority="tertiary" size="lg" fullWidth>
+            診断ガイドを見る
+          </CtaLink>
+        </div>
       </div>
     </div>
   );

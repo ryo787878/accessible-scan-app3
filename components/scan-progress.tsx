@@ -263,9 +263,14 @@ export function ScanProgress({ publicId }: { publicId: string }) {
           <p className="text-muted-foreground text-center text-sm">
             一部のページで診断に失敗しました。完了した結果をレポートで確認できます。
           </p>
-          <CtaLink href={`/report/${publicId}`} priority="secondary" size="lg" fullWidth showArrow className="text-base">
-            レポートを見る
-          </CtaLink>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <CtaLink href={`/report/${publicId}`} priority="secondary" size="lg" fullWidth showArrow className="text-base">
+              レポートを見る
+            </CtaLink>
+            <CtaLink href="/ja/accessibility-diagnosis" priority="tertiary" size="lg" fullWidth>
+              診断ガイドを見る
+            </CtaLink>
+          </div>
         </div>
       )}
     </div>
