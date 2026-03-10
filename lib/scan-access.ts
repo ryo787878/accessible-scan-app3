@@ -11,6 +11,11 @@ export async function resolveScanAccess(publicId: string, viewerUserId: string |
   const scanModel = db.scan as {
     findUnique?: (args: { where: { publicId: string }; select: { userId: true } }) => Promise<{ userId: string | null } | null>;
     findFirst?: (args: { where: { publicId: string }; select: { userId: true } }) => Promise<{ userId: string | null } | null>;
+    findMany?: (args: {
+      where: { publicId: string };
+      select: { userId: true };
+      take: number;
+    }) => Promise<Array<{ userId: string | null }>>;
   };
 
   const query = {
@@ -22,7 +27,9 @@ export async function resolveScanAccess(publicId: string, viewerUserId: string |
     ? await scanModel.findUnique(query)
     : scanModel.findFirst
       ? await scanModel.findFirst(query)
-      : null;
+      : scanModel.findMany
+        ? (await scanModel.findMany({ ...query, take: 1 }))[0] ?? null
+        : null;
 
   if (!scan) {
     return "not_found";
