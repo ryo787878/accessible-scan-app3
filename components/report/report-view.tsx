@@ -147,21 +147,23 @@ export function ReportView({ publicId }: ReportViewProps) {
   const isMember = status === "authenticated";
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-8 md:gap-10">
       {/* Header */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-4">
         <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
           アクセシビリティ診断レポート
         </h1>
-        <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-          <span className="inline-flex items-center gap-1.5">
+        <div className="grid gap-2 text-sm sm:grid-cols-2">
+          <div className="text-muted-foreground inline-flex items-center gap-1.5 rounded-md border px-2.5 py-2">
             <ExternalLink className="size-3.5 shrink-0" aria-hidden="true" />
             <span className="truncate">{scan.url}</span>
-          </span>
-          <span>診断日時: {formattedDate}</span>
-          <span>
+          </div>
+          <div className="text-muted-foreground rounded-md border px-2.5 py-2">
+            診断日時: {formattedDate}
+          </div>
+          <div className="text-muted-foreground rounded-md border px-2.5 py-2 sm:col-span-2">
             {scan.pages.filter((p) => p.status === "success").length}ページ診断完了
-          </span>
+          </div>
         </div>
         <ScoreOverview scan={scan} />
       </div>

@@ -153,9 +153,10 @@ export function ScanProgress({ publicId }: { publicId: string }) {
     (p) => p.status === "pending" || p.status === "queued" || p.status === "running"
   ).length;
   const totalPages = scan.pages.length;
+  const completedCount = successCount + failedCount + skippedCount;
   const progressPercent =
     totalPages > 0
-      ? Math.round(((successCount + failedCount + skippedCount) / totalPages) * 100)
+      ? Math.round((completedCount / totalPages) * 100)
       : 0;
   const isCompleted = scan.status === "completed";
   const isFailed = scan.status === "failed";
@@ -187,27 +188,35 @@ export function ScanProgress({ publicId }: { publicId: string }) {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Card>
-          <CardHeader className="p-4">
+          <CardHeader className="p-3 sm:p-4">
             <CardDescription>成功</CardDescription>
-            <CardTitle className="text-2xl text-emerald-600">
+            <CardTitle className="text-xl text-emerald-600 sm:text-2xl">
               {successCount}
             </CardTitle>
           </CardHeader>
         </Card>
         <Card>
-          <CardHeader className="p-4">
+          <CardHeader className="p-3 sm:p-4">
             <CardDescription>失敗</CardDescription>
-            <CardTitle className="text-severity-critical text-2xl">
+            <CardTitle className="text-severity-critical text-xl sm:text-2xl">
               {failedCount}
             </CardTitle>
           </CardHeader>
         </Card>
         <Card>
-          <CardHeader className="p-4">
+          <CardHeader className="p-3 sm:p-4">
+            <CardDescription>スキップ</CardDescription>
+            <CardTitle className="text-xl text-amber-500 sm:text-2xl">
+              {skippedCount}
+            </CardTitle>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader className="p-3 sm:p-4">
             <CardDescription>残り</CardDescription>
-            <CardTitle className="text-muted-foreground text-2xl">
+            <CardTitle className="text-muted-foreground text-xl sm:text-2xl">
               {pendingCount}
             </CardTitle>
           </CardHeader>
@@ -219,7 +228,7 @@ export function ScanProgress({ publicId }: { publicId: string }) {
         <CardHeader>
           <CardTitle className="text-base">ページ一覧</CardTitle>
           <CardDescription>
-            {totalPages}ページ中{successCount + failedCount + skippedCount}ページの診断が完了
+            {totalPages}ページ中{completedCount}ページの診断が完了
           </CardDescription>
         </CardHeader>
         <CardContent>
