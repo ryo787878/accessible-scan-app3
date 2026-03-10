@@ -30,11 +30,11 @@ jobs:
       - name: Run tests
         run: npm test
 
+      - name: Generate Prisma client (Linux + VPS runtime)
+        run: npx prisma generate
+
       - name: Build app
         run: npm run build
-
-      - name: Prune dev dependencies for runtime bundle
-        run: npm prune --omit=dev
 
       - name: Setup SSH key
         run: |
@@ -114,7 +114,6 @@ jobs:
           set -euo pipefail
           cd "${VPS_DEPLOY_PATH}"
           npx prisma migrate deploy
-          npx playwright install chromium
           sudo -n systemctl restart accessible-scan
 
           # Wait for service to become active
