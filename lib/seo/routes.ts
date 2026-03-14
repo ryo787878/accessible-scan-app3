@@ -12,7 +12,7 @@ export const caseRoutes = [
 ] as const;
 export const industryRoutes = ["/ja/industry", "/ja/industry/ecommerce", "/ja/industry/public-sector", "/ja/industry/recruit"] as const;
 
-export const seoStaticRoutes = ["/", "/ja", "/ja/accessibility-diagnosis", "/terms", "/privacy"] as const;
+export const seoStaticRoutes = ["/", "/ja", "/ja/accessibility-diagnosis"] as const;
 
 const slugUnsafeChars = /[^\p{L}\p{N}\s-]/gu;
 const slugSpaces = /\s+/g;
